@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
+  <ItemGroup>
+    <Compile Update="CustomComponents\MenuStrip\CustomMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomComponents\Panels\PanelWithBorder.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomComponents\TextBoxes\ColorTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Windows\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\ColorForms\ColorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\ColorForms\EditColorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\ColorForms\SelectColorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FilePropertyForms\EditPropertyNamesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FilePropertyForms\EditPropertyValuesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FilePropertyForms\FilePropertyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontForms\EditFontForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontForms\FontForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontForms\SelectFontForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontStyleForms\EditFontStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontStyleForms\FontStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\FontStyleForms\SelectFontStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\EditIconNameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\EditIconStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\IconStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\SelectColorIdForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\SelectIconStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\NewProjectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\ProjectSettings\ExportSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\ProjectSettings\ImportSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextInstructionForms\HeaderPropertyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextInstructionForms\ImportTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextInstructionForms\NewTextInstructionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextStyleForms\EditTextStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextStyleForms\SelectTextStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextStyleForms\SelectTextStylePropertyForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\TextStyleForms\TextStyleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
