@@ -43,6 +43,6 @@
 
         // File extensions
         //
-        public const string ProjectFileExtension = ".iic_prj";
+        public const string ProjectFileExtension = ".giprj";
     }
 }

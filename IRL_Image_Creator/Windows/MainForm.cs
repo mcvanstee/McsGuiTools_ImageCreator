@@ -118,7 +118,7 @@ namespace IRL_Image_Creator.Windows
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileDialog.Filter = $"IIC project files | *{FileConstants.ProjectFileExtension}";
+            FileDialog.Filter = $"GI project files | *{FileConstants.ProjectFileExtension}";
             FileDialog.Multiselect = false;
             DialogResult result = FileDialog.ShowDialog(this);
 
