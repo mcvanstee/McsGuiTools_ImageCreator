@@ -1,6 +1,5 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
 using IRL_Gui_Image_Builder_Library.Projects;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
@@ -33,35 +32,40 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine(
                 "uint32_t crc_32(const unsigned char *input_str, size_t num_bytes)\r\n" +
                 "{\r\n" +
-                "    uint32_t crc;\r\n" +
+                "    return update_crc_32(CRC_START_32, input_str, num_bytes);\r\n" +
+                "} /* update_crc_32 */");
+
+            CodeGenegrationUtils.BlankLine(sw);
+
+            sw.WriteLine(
+                "/*\r\n" +
+                " * uint32_t update_crc_32(uint32_t crc, const unsigned char *input_str, size_t num_bytes)\r\n" +
+                " *\r\n" +
+                " * The function update_crc_32() calculates a new CRC-32 value based on the\r\n" +
+                " * previous value of the CRC and the next byte of the data to be checked.\r\n" +
+                " */");
+
+            CodeGenegrationUtils.BlankLine(sw);
+
+            sw.WriteLine(
+                "uint32_t update_crc_32(uint32_t crc, const unsigned char *input_str, size_t num_bytes)\r\n" +
+                "{\r\n" +
                 "    const unsigned char *ptr;\r\n" +
                 "    size_t a;\r\n" +
                 "\r\n" +
-                "    crc = CRC_START_32;\r\n" +
                 "    ptr = input_str;\r\n" +
                 "\r\n" +
                 "    if (ptr != NULL)\r\n" +
                 "    {\r\n" +
-                "        for (a=0; a < num_bytes; a++)\r\n " +
+                "        for (a = 0; a < num_bytes; a++)\r\n" +
                 "        {\r\n" +
                 "            crc = (crc >> 8) ^ crc_tab32[(crc ^ (uint32_t) *ptr++) & 0x000000FFul];\r\n" +
                 "        }\r\n" +
                 "    }\r\n" +
                 "\r\n" +
-                "    return (crc ^ 0xFFFFFFFFul);\r\n" +
-                "}  /* crc_32 */\r\n" +
-                "\r\n" +
-                "/*\r\n" +
-                " * uint32_t update_crc_32(uint32_t crc, unsigned char c);\r\n" +
-                " *\r\n" +
-                " * The function update_crc_32() calculates a new CRC-32 value based on the\r\n" +
-                " * previous value of the CRC and the next byte of the data to be checked.\r\n" +
-                " */\r\n" +
-                "\r\n" +
-                "uint32_t update_crc_32(uint32_t crc, unsigned char c)\r\n" +
-                "{\r\n" +
-                "    return (crc >> 8) ^ crc_tab32[(crc ^ (uint32_t)c) & 0x000000FFul];\r\n" +
-                "} /* update_crc_32 */\r\n");
+                "    return crc;\r\n" +
+                "} /* update_crc_32 */");
+
 
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.EndOfFile(sw);

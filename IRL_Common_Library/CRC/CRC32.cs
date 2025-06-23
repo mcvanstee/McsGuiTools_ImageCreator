@@ -2,7 +2,7 @@
 {
     public static class CRC32
     {
-        static readonly uint[] crc32_tab = new uint[]{
+        static readonly uint[] Crc32Table = new uint[]{
               0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419,
               0x706af48f, 0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4,
               0xe0d5e91e, 0x97d2d988, 0x09b64c2b, 0x7eb17cbd, 0xe7b82d07,
@@ -57,48 +57,20 @@
               0x2d02ef8d
            };
 
-        /* This is the standard Gary S. Brown's 32 bit CRC algorithm, but
-           accumulate the CRC into the result of a previous CRC. */
-        public static uint CygCrc32Accumulate(uint crc32val, ref byte[] s, int len)
-        {
-            int i;
 
-            for (i = 0; i < len; i++)
+        public static uint GetCrc32Accumulate(uint crc32val, ref byte[] data, int length)
+        {
+            for (int i = 0; i < length; i++)
             {
-                crc32val = crc32_tab[(crc32val ^ s[i]) & 0xff] ^ crc32val >> 8;
+                crc32val = Crc32Table[(crc32val ^ data[i]) & 0xFF] ^ crc32val >> 8;
             }
+
             return crc32val;
         }
 
-        /* This is the standard Gary S. Brown's 32 bit CRC algorithm */
-        public static uint CygCrc32(ref byte[] s, int len)
+        public static uint GetCrc32(ref byte[] data, int length, uint startValue = 0xFFFFFFFF)
         {
-            return CygCrc32Accumulate(0, ref s, len);
-        }
-
-        /* Return a 32-bit CRC of the contents of the buffer accumulating the
-           result from a previous CRC calculation. This uses the Ethernet FCS
-           algorithm.*/
-        public static uint CygEtherCrc32Accumulate(uint crc32val, ref byte[] s, int len)
-        {
-            int i;
-
-            //  if (s == 0) return 0;
-
-            crc32val /*^*/= 0xffffffff;
-            for (i = 0; i < len; i++)
-            {
-                crc32val = crc32val >> 8 ^ crc32_tab[(crc32val ^ s[i]) & 0x000000ff];
-                //crc32val = crc32_tab[(crc32val ^ s[i]) & 0xff] ^ (crc32val >> 8);
-            }
-            return crc32val ^ 0xffffffff;
-        }
-
-        /* Return a 32-bit CRC of the contents of the buffer, using the
-           Ethernet FCS algorithm. */
-        public static uint Cyg_ether_crc32(ref byte[] s, int len)
-        {
-            return CygEtherCrc32Accumulate(0, ref s, len);
+            return GetCrc32Accumulate(startValue, ref data, length);
         }
     }
 }

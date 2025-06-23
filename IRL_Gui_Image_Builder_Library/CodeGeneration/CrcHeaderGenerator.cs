@@ -10,7 +10,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
         {
             StreamWriter sw = new StreamWriter(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.CrcFile + ".h");
 
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.SearchTreeFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.CrcFile);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.IncludeStdInt(sw);
@@ -18,7 +18,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
 
             sw.WriteLine("uint32_t crc_32(const unsigned char *input_str, size_t num_bytes);");
-            sw.WriteLine("uint32_t update_crc_32(uint32_t crc, unsigned char c);");
+            sw.WriteLine("uint32_t update_crc_32(uint32_t crc, const unsigned char *input_str, size_t num_bytes);");
 
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.BlankLine(sw);
