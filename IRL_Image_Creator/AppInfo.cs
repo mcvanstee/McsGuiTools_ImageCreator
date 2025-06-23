@@ -2,7 +2,7 @@
 {
     public static class AppInfo
     {
-        public static string Version => "2.0.0";
+        public static string Version => "2.0.1";
         public static string Email => "info@irlsoftware.nl";
     }
 }

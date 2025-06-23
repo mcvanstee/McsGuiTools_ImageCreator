@@ -97,7 +97,21 @@ namespace IRL_Image_Creator.Windows.Helpers
             Project.Save(project);
 
             List<FSColor> fsColors = GetFSColors(project.Colors);
-            project.ImageBuilderSettings.UseProperties = project.ImageBuilderSettings.Properties.Length > 0;
+
+            // Check if properties are used
+            //
+            foreach (Property property in project.ImageBuilderSettings.Properties)
+            {
+                if (property.Use)
+                {
+                    project.ImageBuilderSettings.UseProperties = true;
+
+                    break;
+                }
+
+                project.ImageBuilderSettings.UseProperties = false;
+            }
+
             string message = ImageBuilder.StartConvertingBmps(
                 project.ImageBuilderSettings, fsColors, statusUpdater,
                 project.ProjectFolder, project.UserSourceFolder);

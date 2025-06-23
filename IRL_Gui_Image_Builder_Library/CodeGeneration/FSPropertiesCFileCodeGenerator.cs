@@ -24,7 +24,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                 sw.WriteLine("{");
                 foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FsbFileInfos)
                 {
-                    WriteFileInfo(sw, fsbFileInfo, builderSettings.PropertiesUsed);
+                    WriteFileInfo(sw, fsbFileInfo, builderSettings.PropertiesUsed, builderSettings.FileSystemFormat.FileFormat);
                 }
                 sw.WriteLine("};");
             }
@@ -69,9 +69,11 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.Close();
         }
 
-        public static void WriteFileInfo(StreamWriter sw, FsbFileInfo fsbFileInfo, int maxProperties)
+        public static void WriteFileInfo(StreamWriter sw, FsbFileInfo fsbFileInfo, int maxProperties, FileFormat fileFormat)
         {
             FsbFile file = fsbFileInfo.FsbFile;
+
+            string dataOffsetStr = (fileFormat == FileFormat.CompressedImage) ? file.DataOffsetCompressed.ToString() : file.DataOffset.ToString();
 
             if (maxProperties != 0)
             {
@@ -79,11 +81,11 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                 string filename = fsbFileInfo.IsDummy ? "Dummy file, " + fsbFileInfo.FileKey : fsbFileInfo.Filename;
                 string comment = "    /* " + filename + ", " + Convert.ToString(file.Properties, 2) + " */";
 
-                sw.WriteLine("    { .dataOffset = " + file.DataOffset.ToString() + propertiesStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " }," + comment);
+                sw.WriteLine("    { .dataOffset = " + dataOffsetStr + propertiesStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " }," + comment);
             }
             else
             {
-                sw.WriteLine("    { .dataOffset = " + file.DataOffset.ToString() + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " },");
+                sw.WriteLine("    { .dataOffset = " + dataOffsetStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " },");
             }
         }
 

@@ -3,6 +3,7 @@
     public class FsbFile
     {
         public uint DataOffset { get; set; }
+        public uint DataOffsetCompressed { get; set; }
         public ushort Properties { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
@@ -18,7 +19,6 @@
             {
                 byte properties = (byte)fsbFile.Properties;
                 bytes[index] = properties;
-                //BitConverter.GetBytes(properties).CopyTo(bytes, index);
                 index += 1;
             }
             else if (sizeOfFileInfo == 10)

@@ -252,63 +252,6 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
             }
         }
 
-        //private void AddAllFileProperties()
-        //{
-        //    if (m_builderSettings.UseProperties)
-        //    {
-        //        foreach (FsbFileInfo fileinfo in FsbFileInfos)
-        //        {
-        //            AddProperties(fileinfo);
-        //        }
-        //    }
-        //}
-
-        //private void AddProperties(FsbFileInfo fileinfo)
-        //{
-        //    if (!fileinfo.FileKey.Contains("__"))
-        //    {
-        //        fileinfo.HasFileProperties = false;
-
-        //        return;
-        //    }
-
-        //    int indexProperties = fileinfo.FileKey.IndexOf("__");
-        //    fileinfo.FileNameWithoutProperties = fileinfo.FileKey.Remove(indexProperties, fileinfo.FileKey.Length - indexProperties);
-        //    fileinfo.HasFileProperties = true;
-
-        //    string propertiesFilename = fileinfo.FileKey.Remove(0, (fileinfo.FileKey.LastIndexOf("__") + 1));
-
-        //    int propertyIndex = 0;
-        //    foreach (Property property in m_builderSettings.Properties)
-        //    {
-        //        if (property.Use)
-        //        {
-        //            int propertyNameIndex = propertiesFilename.IndexOf("_" + property.Name);
-
-        //            if (propertyNameIndex >= 0)
-        //            {
-        //                propertyNameIndex += 1;
-        //                int propertyValueIndex = propertyNameIndex + 1;
-
-        //                string propertyName = propertiesFilename[propertyNameIndex].ToString();
-        //                string propertyValue = GetPropertyValue(propertiesFilename, propertyValueIndex);
-
-        //                FsbFileProperty fileProperty = new FsbFileProperty(propertyName, property.Alias, propertyValue, propertyIndex);
-        //                fileinfo.FsbFileProperties.Add(fileProperty);
-        //            }
-        //        }
-
-        //        propertyIndex += 1;
-        //    }
-        //}
-
-        //private static string GetPropertyValue(string fileName, int propertyValueIndex) 
-        //{
-        //    string value = fileName.Substring(propertyValueIndex, 3);
-
-        //    return value;
-        //}
-
         private bool CheckFileProperties()
         {
             bool result = true;

@@ -10,6 +10,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
         public byte ASSCI { get; private set; }
         public uint DataOffset { get; set; }
         public uint DataSize { get; set; }
+        public uint DataOffsetCompressed { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
 

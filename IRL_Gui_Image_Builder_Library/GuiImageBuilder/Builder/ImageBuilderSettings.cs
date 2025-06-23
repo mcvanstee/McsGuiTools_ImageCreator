@@ -92,7 +92,8 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
     public enum FileFormat
     {
         SingleFile,
-        BasicImage
+        BasicImage,
+        CompressedImage,
     }
 
     [Serializable]

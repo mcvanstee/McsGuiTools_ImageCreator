@@ -18,7 +18,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             }
             else
             {
-                CreateFontCharInfoSearchCFile(projectPath, fontBuilder);
+                CreateFontCharInfoSearchCFile(projectPath, fontBuilder, builderSettings.FileSystemFormat.FileFormat);
             }
         }
 
@@ -42,9 +42,16 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             sw.WriteLine("typedef enum");
             sw.WriteLine("{");
-            for (int i = 0; i < fontBuilder.Fonts.Count; i++)
+            if (fontBuilder.Fonts.Count == 0)
             {
-                sw.WriteLine("    FONT_KEY_" + fontBuilder.Fonts[i].Name.ToUpper() + " = " + i.ToString() + ",");
+                sw.WriteLine("    NoFonts = 0,           // No fonts");
+            }
+            else
+            {
+                for (int i = 0; i < fontBuilder.Fonts.Count; i++)
+                {
+                    sw.WriteLine("    FONT_KEY_" + fontBuilder.Fonts[i].Name.ToUpper() + " = " + i.ToString() + ",");
+                }
             }
             sw.WriteLine("} font_key_e;");
             CodeGenegrationUtils.BlankLine(sw);
@@ -68,7 +75,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.Close();
         }
 
-        private static void CreateFontCharInfoSearchCFile(string projectPath, FontBuilder fontBuilder)
+        private static void CreateFontCharInfoSearchCFile(string projectPath, FontBuilder fontBuilder, FileFormat fileFormat)
         {
             StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.CharInfoSearchFile + ".c");
             int fonts = fontBuilder.Fonts.Count;
@@ -87,7 +94,9 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                     byte width = (byte)charInfo.Width;
                     byte height = (byte)charInfo.Height;
 
-                    sw.WriteLine("    { .dataOffset = " + charInfo.DataOffset.ToString() + ", .width = " + width.ToString() + ", .height = " + height.ToString() + " },");
+                    string dataOffsetStr = (fileFormat == FileFormat.CompressedImage) ? charInfo.DataOffsetCompressed.ToString() : charInfo.DataOffset.ToString();
+
+                    sw.WriteLine("    { .dataOffset = " + dataOffsetStr + ", .width = " + width.ToString() + ", .height = " + height.ToString() + " },");
                 }
                 sw.WriteLine("    },");
             }
