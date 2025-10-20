@@ -13,7 +13,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         public static bool CreateBitmaps(
             List<ConverterInstruction> instructions, List<ConverterFont> fonts,
             List<TextStyle> textStyles, List<FontBitmapStyle> fontBitmapStyles, List<IconStyle> iconStyles,
-            int noOfTranslationPropertyValues, string outputFolder, ConverterStatusUpdater statusUpdater)
+            bool bitmapMaskOnly, int noOfTranslationPropertyValues, string outputFolder, ConverterStatusUpdater statusUpdater)
         {
             bool result = false;
 
@@ -25,7 +25,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
             foreach (ConverterInstruction instruction in instructions)
             {
-                result = ProcessInstructions(instruction, textStyles, fontBitmapStyles, iconStyles, fonts, noOfTranslationPropertyValues, outputFolder, statusUpdater);
+                result = ProcessInstructions(instruction, textStyles, fontBitmapStyles, iconStyles, fonts, bitmapMaskOnly, noOfTranslationPropertyValues, outputFolder, statusUpdater);
 
                 if (!result)
                 {
@@ -40,7 +40,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
         private static bool ProcessInstructions(
             ConverterInstruction instruction, List<TextStyle> textStyles, List<FontBitmapStyle> fontBitmapStyles, List<IconStyle> iconStyles,
-            List<ConverterFont> fonts, int noOfTranslationPropertyValues, string outputFolder, ConverterStatusUpdater statusUpdater)
+            List<ConverterFont> fonts, bool bitmapMaskOnly, int noOfTranslationPropertyValues, string outputFolder, ConverterStatusUpdater statusUpdater)
         {
             bool result = true;
 
@@ -55,7 +55,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                 foreach (FontBitmap fontBitmap in fontInstruction.FontBitmaps)
                 {
                     bool bitmapsCreated = FontToBitmapConverter.BuildFontBitmaps(
-                        fontBitmap, fontBitmapStyles, fonts, fontPath, fontInstruction.FontFileKeyFormat, statusUpdater);
+                        fontBitmap, fontBitmapStyles, bitmapMaskOnly, fonts, fontPath, fontInstruction.FontFileKeyFormat, statusUpdater);
                     if (!bitmapsCreated)
                     {
                         result = false;
@@ -69,7 +69,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                 string bmpPath = outputFolder + FileConstants.BmpImportFolder + FileConstants.ConverterOutputFolder + "\\_" + instructionName;
                 Directory.CreateDirectory(bmpPath);
 
-                result = TextConverter.ConvertTextInstructionToBitmaps(textInstruction, textStyles, noOfTranslationPropertyValues, bmpPath);
+                result = TextConverter.ConvertTextInstructionToBitmaps(textInstruction, textStyles, bitmapMaskOnly, noOfTranslationPropertyValues, bmpPath);
             }
             else if (instruction is IconInstruction iconInstruction)
             {
@@ -78,7 +78,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
                 foreach (SvgFileInfo svgFileInfo in iconInstruction.SvgFileInfos)
                 {
-                    bool iconBitmapsCreated = IconConverter.ConvertSvgToBitmaps(svgFileInfo, iconStyles, statusUpdater, bmpPath);
+                    bool iconBitmapsCreated = IconConverter.ConvertSvgToBitmaps(svgFileInfo, iconStyles, bitmapMaskOnly, statusUpdater, bmpPath);
                     if (!iconBitmapsCreated)
                     {
                         result = false;

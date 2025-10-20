@@ -25,23 +25,33 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.DefineIfNotDefined(sw, "FS_PIXEL_DATA_CRC", fsbBuilder.CRC.ToString() + "u");
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.Define(sw, "FS_FILES", fsbBuilder.FsbFileInfos.Count.ToString());
+
+            if (builderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage)
+            {
+                CodeGenegrationUtils.Define(sw, "FS_FILES_OPTIMIZED", fsbBuilder.NoOfOptimizedFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILES_PIXEL_DATA", fsbBuilder.NoOfPixelDataFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILES_START_PIXEL_DATA_INDEX", fsbBuilder.NoOfOptimizedFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_CODE", "0");
+                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_PIXEL_DATA", "1");
+            }
+
             CodeGenegrationUtils.Define(sw, "FS_MAX_FILE_PROPERTIES", settings.PropertiesUsed + "U");
             CodeGenegrationUtils.Define(sw, "FS_BYTES_PER_PIXEL", bytesPerPixel.ToString());
             CodeGenegrationUtils.BlankLine(sw);
 
             sw.WriteLine("typedef struct");
             sw.WriteLine("{");
-            sw.WriteLine("    uint32_t dataOffset; /* Pixeldata starts at this byte offset */");
+            sw.WriteLine("    uint32_t dataOffset;  /* Pixeldata starts at this byte offset */");
             if (settings.PropertiesUsed > 8)
             {
-                sw.WriteLine("    uint16_t properties; /* Properties in use */");
+                sw.WriteLine("    uint16_t properties;  /* Properties in use */");
             }
             else
             {
-                sw.WriteLine("    uint8_t properties;  /* Properties in use */");
+                sw.WriteLine("    uint8_t properties;   /* Properties in use */");
             }
-            sw.WriteLine("    uint16_t width;      /* Width of image in pixels */");
-            sw.WriteLine("    uint16_t height;     /* Height of image in pixels */");
+            sw.WriteLine("    uint16_t width;       /* Width of image in pixels */");
+            sw.WriteLine("    uint16_t height;      /* Height of image in pixels */");
             sw.WriteLine("} fs_file_info_s;");
 
             CodeGenegrationUtils.BlankLine(sw);
@@ -54,29 +64,30 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 
             sw.WriteLine("typedef enum");
             sw.WriteLine("{");
+            sw.WriteLine("    FILE_KEY_NONE = 0,");
 
             foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FsbFileInfos)
             {
                 string key = "FILE_KEY_";
+                string fileIndexStr = (fsbFileInfo.FileIndex + 1).ToString();
 
                 if (!fsbFileInfo.HasFileProperties)
                 {
-                    sw.WriteLine("    " + key + fsbFileInfo.FileKey + " = " + fsbFileInfo.FileIndex.ToString() + ",");
+                    sw.WriteLine("    " + key + fsbFileInfo.FileKey + " = " + fileIndexStr + ",");
                 }
                 else if (fsbFileInfo.IsRootFileProperty)
                 {
-                    int offset = longestFileKeyLength - fsbFileInfo.FileNameWithoutProperties.Length - fsbFileInfo.FileIndex.ToString().Length;
+                    int offset = longestFileKeyLength - fsbFileInfo.FileNameWithoutProperties.Length - fileIndexStr.Length;
                     offset += 2;
 
                     string comment = GetFilePropertiesComment(fsbFileInfo.FsbFileProperties, offset);
-                    sw.WriteLine("    " + key + fsbFileInfo.FileNameWithoutProperties.ToUpper() + " = " + fsbFileInfo.FileIndex.ToString() + "," + comment);
+                    sw.WriteLine("    " + key + fsbFileInfo.FileNameWithoutProperties.ToUpper() + " = " + fileIndexStr + "," + comment);
                 }
                 else
                 {
                     // Do not add to file key enum
                 }
             }
-            sw.WriteLine("    FILE_KEY_NONE = 0xFFFFFFFF");
             sw.WriteLine("} file_key_e;");
             CodeGenegrationUtils.BlankLine(sw);
             sw.WriteLine("/**");
@@ -91,7 +102,8 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("                            const file_key_e file_key,");
             sw.WriteLine("                            const uint8_t *p_properties,");
             sw.WriteLine("                            const uint8_t propertiesLength,");
-            sw.WriteLine("                            fs_file_info_s *p_out_file_info);");
+            sw.WriteLine("                            fs_file_info_s *p_out_file_info,");
+            sw.WriteLine("                            uint8_t *p_dataLocation);");
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);

@@ -8,7 +8,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
     public static class TextConverter
     {
         public static bool ConvertTextInstructionToBitmaps(
-            TextInstruction textInstruction, List<TextStyle> textStyles, int noOfTranslationPropertyValues, string outputFolder)
+            TextInstruction textInstruction, List<TextStyle> textStyles, bool bitmapMaskOnly, int noOfTranslationPropertyValues, string outputFolder)
         {
             if (Directory.Exists(outputFolder))
             {
@@ -27,19 +27,19 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
                 if (textInstruction.Table.Translate)
                 {
-                    success &= ConvertTranslationTextRecord(record, textStyles, textInstruction.Table.TranslationProperty, noOfTranslationPropertyValues, textInstruction.FileKeyPrefix, outputFolder);
+                    success &= ConvertTranslationTextRecord(record, textStyles, bitmapMaskOnly, textInstruction.Table.TranslationProperty, noOfTranslationPropertyValues, textInstruction.FileKeyPrefix, outputFolder);
                 }
                 else
                 {
 
-                    success &= ConvertTextRecord(record, textStyles, textInstruction.FileKeyPrefix, outputFolder);
+                    success &= ConvertTextRecord(record, textStyles, bitmapMaskOnly, textInstruction.FileKeyPrefix, outputFolder);
                 }
             }
 
             return success;
         }
 
-        private static bool ConvertTextRecord(TextRecord record, List<TextStyle> textStyles, string fileKeyPrefix, string outputFolder)
+        private static bool ConvertTextRecord(TextRecord record, List<TextStyle> textStyles, bool bitmapMaskOnly, string fileKeyPrefix, string outputFolder)
         {
             foreach (int styleId in record.TextStyleIDs)
             {
@@ -56,11 +56,19 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                         try
                         {
                             Font font = new(style.FontName, style.FontSize, style.FontStyle, GraphicsUnit.Pixel);
+                            Color textColor = style.TextColor;
+                            Color backColor = style.BackColor;
+
+                            if (bitmapMaskOnly)
+                            {
+                                textColor = Color.Black;
+                                backColor = Color.White;
+                            }
 
                             StringToBitmapConverter.GenerateImage(
                                     record.Text[i], font,
                                     style.Margin.Left, style.Margin.Top, style.Margin.Right, style.Margin.Bottom,
-                                    style.TextColor, style.BackColor,
+                                    textColor, backColor,
                                     fileOutputFolder, filename);
                         }
                         catch (Exception exception)
@@ -81,7 +89,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         }
 
         private static bool ConvertTranslationTextRecord(
-            TextRecord record, List<TextStyle> textStyles, BitmapProperty translationProperty,
+            TextRecord record, List<TextStyle> textStyles, bool bitmapMaskOnly, BitmapProperty translationProperty,
             int noOfTranslationPropertyValues, string fileKeyPrefix, string outputFolder)
         {
             bool success = true;
@@ -114,11 +122,19 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                         try
                         {
                             Font font = new(style.FontName, style.FontSize, style.FontStyle, GraphicsUnit.Pixel);
+                            Color textColor = style.TextColor;
+                            Color backColor = style.BackColor;
+
+                            if (bitmapMaskOnly)
+                            {
+                                textColor = Color.Black;
+                                backColor = Color.White;
+                            }
 
                             StringToBitmapConverter.GenerateImage(
                                     record.Text[i], font,
                                     style.Margin.Left, style.Margin.Top, style.Margin.Right, style.Margin.Bottom,
-                                    style.TextColor, style.BackColor,
+                                    textColor, backColor,
                                     fileOutputFolder, filename);
                         }
                         catch (Exception exception)

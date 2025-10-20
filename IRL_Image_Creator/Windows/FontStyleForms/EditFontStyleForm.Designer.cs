@@ -43,7 +43,7 @@
             label11 = new Label();
             label10 = new Label();
             label9 = new Label();
-            MonospaceNumbersCheckBox = new CheckBox();
+            MonospaceDigitsCheckBox = new CheckBox();
             tableLayoutPanel4 = new TableLayoutPanel();
             label1 = new Label();
             NameTextBox = new TextBox();
@@ -52,13 +52,14 @@
             panel1 = new Panel();
             textColorLabel = new Label();
             SelectTextColorButton = new Button();
-            TextColorTB = new CustomComponents.TextBoxes.ColorTextBox();
+            TextColorTB = new IRL_Image_Creator.CustomComponents.TextBoxes.ColorTextBox();
             tableLayoutPanel6 = new TableLayoutPanel();
             label3 = new Label();
             panel2 = new Panel();
             backColorLabel = new Label();
             SelectBackColorButton = new Button();
-            BackColorTB = new CustomComponents.TextBoxes.ColorTextBox();
+            BackColorTB = new IRL_Image_Creator.CustomComponents.TextBoxes.ColorTextBox();
+            DigitsOnlyCheckBox = new CheckBox();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
@@ -131,16 +132,18 @@
             // 
             tableLayoutPanel3.ColumnCount = 1;
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Controls.Add(panel9, 0, 4);
-            tableLayoutPanel3.Controls.Add(MonospaceNumbersCheckBox, 0, 3);
+            tableLayoutPanel3.Controls.Add(panel9, 0, 5);
+            tableLayoutPanel3.Controls.Add(MonospaceDigitsCheckBox, 0, 4);
             tableLayoutPanel3.Controls.Add(tableLayoutPanel4, 0, 0);
             tableLayoutPanel3.Controls.Add(tableLayoutPanel5, 0, 1);
             tableLayoutPanel3.Controls.Add(tableLayoutPanel6, 0, 2);
+            tableLayoutPanel3.Controls.Add(DigitsOnlyCheckBox, 0, 3);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(0, 0);
             tableLayoutPanel3.Margin = new Padding(0);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
-            tableLayoutPanel3.RowCount = 5;
+            tableLayoutPanel3.RowCount = 6;
+            tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Absolute, 35F));
@@ -161,9 +164,9 @@
             panel9.Controls.Add(label10);
             panel9.Controls.Add(label9);
             panel9.Dock = DockStyle.Fill;
-            panel9.Location = new Point(3, 143);
+            panel9.Location = new Point(3, 178);
             panel9.Name = "panel9";
-            panel9.Size = new Size(613, 274);
+            panel9.Size = new Size(613, 239);
             panel9.TabIndex = 14;
             // 
             // BottomMarginTB
@@ -243,16 +246,16 @@
             label9.TabIndex = 24;
             label9.Text = "Bottom";
             // 
-            // MonospaceNumbersCheckBox
+            // MonospaceDigitsCheckBox
             // 
-            MonospaceNumbersCheckBox.AutoSize = true;
-            MonospaceNumbersCheckBox.Location = new Point(8, 114);
-            MonospaceNumbersCheckBox.Margin = new Padding(8, 9, 3, 3);
-            MonospaceNumbersCheckBox.Name = "MonospaceNumbersCheckBox";
-            MonospaceNumbersCheckBox.Size = new Size(140, 19);
-            MonospaceNumbersCheckBox.TabIndex = 13;
-            MonospaceNumbersCheckBox.Text = "Monospace Numbers";
-            MonospaceNumbersCheckBox.UseVisualStyleBackColor = true;
+            MonospaceDigitsCheckBox.AutoSize = true;
+            MonospaceDigitsCheckBox.Location = new Point(8, 149);
+            MonospaceDigitsCheckBox.Margin = new Padding(8, 9, 3, 3);
+            MonospaceDigitsCheckBox.Name = "MonospaceDigitsCheckBox";
+            MonospaceDigitsCheckBox.Size = new Size(121, 19);
+            MonospaceDigitsCheckBox.TabIndex = 13;
+            MonospaceDigitsCheckBox.Text = "Monospace Digits";
+            MonospaceDigitsCheckBox.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel4
             // 
@@ -347,7 +350,6 @@
             // TextColorTB
             // 
             TextColorTB.BackColor = SystemColors.Control;
-            TextColorTB.Color = Color.White;
             TextColorTB.Location = new Point(3, 2);
             TextColorTB.MinimumSize = new Size(0, 30);
             TextColorTB.Name = "TextColorTB";
@@ -416,12 +418,22 @@
             // BackColorTB
             // 
             BackColorTB.BackColor = SystemColors.Control;
-            BackColorTB.Color = Color.White;
             BackColorTB.Location = new Point(3, 2);
             BackColorTB.MinimumSize = new Size(0, 30);
             BackColorTB.Name = "BackColorTB";
             BackColorTB.Size = new Size(118, 30);
             BackColorTB.TabIndex = 6;
+            // 
+            // DigitsOnlyCheckBox
+            // 
+            DigitsOnlyCheckBox.AutoSize = true;
+            DigitsOnlyCheckBox.Location = new Point(8, 114);
+            DigitsOnlyCheckBox.Margin = new Padding(8, 9, 3, 3);
+            DigitsOnlyCheckBox.Name = "DigitsOnlyCheckBox";
+            DigitsOnlyCheckBox.Size = new Size(82, 19);
+            DigitsOnlyCheckBox.TabIndex = 15;
+            DigitsOnlyCheckBox.Text = "Digits only";
+            DigitsOnlyCheckBox.UseVisualStyleBackColor = true;
             // 
             // EditFontStyleForm
             // 
@@ -470,7 +482,7 @@
         private Label label3;
         private CustomComponents.TextBoxes.ColorTextBox TextColorTB;
         private CustomComponents.TextBoxes.ColorTextBox BackColorTB;
-        private CheckBox MonospaceNumbersCheckBox;
+        private CheckBox MonospaceDigitsCheckBox;
         private Panel panel9;
         private NumericUpDown BottomMarginTB;
         private NumericUpDown RightMarginTB;
@@ -487,5 +499,6 @@
         private Panel panel2;
         private Button SelectBackColorButton;
         private Label backColorLabel;
+        private CheckBox DigitsOnlyCheckBox;
     }
 }

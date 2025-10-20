@@ -3,10 +3,10 @@
     public class FsbFile
     {
         public uint DataOffset { get; set; }
-        public uint DataOffsetCompressed { get; set; }
         public ushort Properties { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
+        public uint CompressedPixels { get; set; }
 
         public static byte[] GetBytes(FsbFile fsbFile, int sizeOfFileInfo)
         {
@@ -37,6 +37,23 @@
             BitConverter.GetBytes(fsbFile.Height).CopyTo(bytes, index);
 
             return bytes;
+        }
+
+        public void UpdateValues(uint dataOffset, ushort properties, ushort width, ushort height)
+        {
+            DataOffset = dataOffset;
+            Properties = properties;
+            Width = width;
+            Height = height;
+        }
+
+        public void UpdateValues(uint dataOffset, ushort properties, ushort width, ushort height, uint compressedPixels)
+        {
+            DataOffset = dataOffset;
+            Properties = properties;
+            Width = width;
+            Height = height;
+            CompressedPixels = compressedPixels;
         }
     }
 }

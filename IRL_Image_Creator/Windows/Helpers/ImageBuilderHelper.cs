@@ -1,14 +1,15 @@
-﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
-using IRL_Bitmap_Converter_Tools.ConverterInstructions;
+﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions;
+using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
 using IRL_Bitmap_Converter_Tools.Converters;
 using IRL_Bitmap_Converter_Tools.StatusUpdater;
 using IRL_Common_Library.Consts;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Image_Creator.Projects;
-using System.Diagnostics;
-using IRL_Gui_Image_Builder_Library.Projects;
 using IRL_Common_Library.Utils;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
+using IRL_Gui_Image_Builder_Library.Exceptions;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Image_Creator.Projects;
+using System.Diagnostics;
 
 namespace IRL_Image_Creator.Windows.Helpers
 {
@@ -62,7 +63,6 @@ namespace IRL_Image_Creator.Windows.Helpers
             }
             else
             {
-
                 owner.Enabled = false;
                 BuildFolders.ClearLogFolder(project.ProjectFolder);
                 Log.OpenNewFile(BuildFolders.LogFolderPath(project.ProjectFolder));
@@ -112,9 +112,21 @@ namespace IRL_Image_Creator.Windows.Helpers
                 project.ImageBuilderSettings.UseProperties = false;
             }
 
-            string message = ImageBuilder.StartConvertingBmps(
-                project.ImageBuilderSettings, fsColors, statusUpdater,
-                project.ProjectFolder, project.UserSourceFolder);
+            string message;
+            string folderToOpen;
+
+            try
+            {
+                message = ImageBuilder.StartConvertingBmps(
+                    project.ImageBuilderSettings, fsColors, statusUpdater,
+                    project.ProjectFolder, project.UserSourceFolder);
+                folderToOpen = $"{project.ProjectFolder}{FileConstants.BuildFolder}";
+            }
+            catch (ImageBuilderException e)
+            {
+                message = "Error creating image files. Check the log file for details. " + e.Message;
+                folderToOpen = $"{project.ProjectFolder}{FileConstants.LogFolder}";
+            }
 
             // Update version
             //
@@ -128,8 +140,7 @@ namespace IRL_Image_Creator.Windows.Helpers
 
             // Open File explorer
             //
-            string buildFolder = $"{project.ProjectFolder}{FileConstants.BuildFolder}";
-            Process.Start("explorer.exe", @buildFolder);
+            Process.Start("explorer.exe", folderToOpen);
         }
 
         private static bool StartCreateBitmaps(Project project, ConverterStatusUpdater converterStatusUpdater)
@@ -151,9 +162,11 @@ namespace IRL_Image_Creator.Windows.Helpers
                 }
             }
 
+            bool bitmapMaskOnly = project.ImageBuilderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage;
+            
             return MainConverter.CreateBitmaps(
                 project.Instructions, project.Fonts, project.TextStyles, project.FontBitmapStyles, project.IconStyles,
-                numberOfTranslations, project.ProjectFolder, converterStatusUpdater);
+                bitmapMaskOnly, numberOfTranslations, project.ProjectFolder, converterStatusUpdater);
         }
 
         private static List<FSColor> GetFSColors(List<ConverterColor> colors)

@@ -46,7 +46,8 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("                            const file_key_e file_key,");
             sw.WriteLine("                            const uint8_t *p_properties,");
             sw.WriteLine("                            const uint8_t propertiesLength,");
-            sw.WriteLine("                            fs_file_info_s *p_out_file_info)");
+            sw.WriteLine("                            fs_file_info_s *p_out_file_info,");
+            sw.WriteLine("                            uint8_t *p_dataLocation)");
 
             if (builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
             {
@@ -73,13 +74,19 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
         {
             FsbFile file = fsbFileInfo.FsbFile;
 
-            string dataOffsetStr = (fileFormat == FileFormat.CompressedImage) ? file.DataOffsetCompressed.ToString() : file.DataOffset.ToString();
+            string dataOffsetStr = file.DataOffset.ToString();
+            string compressedPixelsStr = "";
+
+            if (fileFormat == FileFormat.OptimizedImage)
+            {
+                compressedPixelsStr = $" Optimized pixels: {file.CompressedPixels.ToString()}";
+            }
 
             if (maxProperties != 0)
             {
                 string propertiesStr = ", .properties = " + file.Properties;
                 string filename = fsbFileInfo.IsDummy ? "Dummy file, " + fsbFileInfo.FileKey : fsbFileInfo.Filename;
-                string comment = "    /* " + filename + ", " + Convert.ToString(file.Properties, 2) + " */";
+                string comment = "    /* " + filename + ", " + Convert.ToString(file.Properties, 2) + compressedPixelsStr + " */";
 
                 sw.WriteLine("    { .dataOffset = " + dataOffsetStr + propertiesStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " }," + comment);
             }
@@ -108,12 +115,14 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 
         private static void WriteFileSearch(StreamWriter sw)
         {
-            sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key;");
+            sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key - 1;");
             sw.WriteLine("");
-            sw.WriteLine("    if ((fileIndex < 0) || (fileIndex >= FS_FILES))");
+            sw.WriteLine("    if ((fileIndex < 0) || (fileIndex > FS_FILES))");
             sw.WriteLine("    {");
             sw.WriteLine("        return FILE_SEARCH_OUT_OF_BOUNDS;");
             sw.WriteLine("    }");
+            sw.WriteLine("");
+            sw.WriteLine("    *p_dataLocation = (fileIndex < FS_FILES_START_PIXEL_DATA_INDEX) ? FS_FILE_LOCATION_CODE : FS_FILE_LOCATION_PIXEL_DATA;");
             sw.WriteLine("");
             sw.WriteLine("    if (0U == propertiesLength)");
             sw.WriteLine("    {");
@@ -169,10 +178,10 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 
         private static void WriteFileSearchInDataFile(StreamWriter sw)
         {
-            sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key;");
+            sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key - 1;");
             sw.WriteLine("    uint32_t offset = fileIndex * FS_FILE_INFO_SIZE;");
             sw.WriteLine("");
-            sw.WriteLine("    if ((fileIndex < 0) || (fileIndex >= FS_FILES))");
+            sw.WriteLine("    if ((fileIndex < 0) || (fileIndex > FS_FILES))");
             sw.WriteLine("    {");
             sw.WriteLine("        return FILE_SEARCH_OUT_OF_BOUNDS;");
             sw.WriteLine("    }");

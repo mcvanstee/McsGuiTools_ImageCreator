@@ -93,7 +93,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
     {
         SingleFile,
         BasicImage,
-        CompressedImage,
+        OptimizedImage,
     }
 
     [Serializable]
@@ -107,6 +107,15 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
 
         [XmlElement]
         public bool SeparateSearchTreeFromData { get; set; } = true;
+
+        [XmlElement]
+        public bool CompressBasicImagePixelData { get; set; } = false;
+
+        [XmlElement]
+        public bool CreatePixelDataFile { get; set; } = false;
+
+        [XmlElement]
+        public bool CompressOptimizedPixelData { get; set; } = false;
     }
 
     public enum PixelFormat

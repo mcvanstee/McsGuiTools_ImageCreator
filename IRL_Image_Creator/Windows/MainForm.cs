@@ -39,6 +39,18 @@ namespace IRL_Image_Creator.Windows
 
             m_statusUpdater.UpdateBuildStatus += OnUpdateBuilderStatus;
             m_converterStatusUpdater.UpdateConverterStatus += OnUpdateConverterStatus;
+
+            AddToolTips();
+        }
+
+        private void AddToolTips()
+        {
+            toolTipMainForm.SetToolTip(ImageFileRadioButton, AppToolTips.MainWindow_ImageFileRadioButton);
+            toolTipMainForm.SetToolTip(IncludeFileInfoInImageCheckbox, AppToolTips.MainWindow_IncludeFileInfoInImageCheckbox);
+            toolTipMainForm.SetToolTip(SingleFileRadioButton, AppToolTips.MainWindow_SingleFileRadioButton);
+            toolTipMainForm.SetToolTip(OptimizedImageRadioButton, AppToolTips.MainWindow_CompressedImageRadioButton);
+
+            toolTipMainForm.SetToolTip(SelectUserFolderButton, AppToolTips.MainWindow_SelectUserFolderButton);
         }
 
         public static MainForm Instance
@@ -233,40 +245,17 @@ namespace IRL_Image_Creator.Windows
         // ## Main Tab ##
         //
 
-        private void SelectedInstrTabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //FontInstructionHelper.RefreshFontListView(m_project, FontsListView);
-            //FontsListViewSetButtons();
-
-            //IconInstructionHelper.RefreshImageListView(m_project, IconListView);
-            //IconListViewSetButtons();
-
-            //TextInstructionHelper.RefreshTextInstructionList(TextInstructionListView, m_project);
-            //TextInstructionListViewSetStateButtons();
-
-
-
-            //TextToConvertListView.Items.Clear();
-        }
-
-
         private void UpdateProjectChanged()
         {
             FileSystemFormat fsFormat = m_project.ImageBuilderSettings.FileSystemFormat;
             IncludeFileInfoInImageCheckbox.Checked = !fsFormat.SeparateSearchTreeFromData;
+            CompressBasicImagePixeldataCheckBox.Checked = fsFormat.CompressBasicImagePixelData;
             IncludeWidthAndHeightCheckbox.Checked = fsFormat.SingleFileIncludeWidthHeight;
             IncludeCharInfoInImageCheckBox.Checked = m_project.ImageBuilderSettings.FontDataInImage;
+            CreatePixelDataFileCheckBox.Checked = fsFormat.CreatePixelDataFile;
+            CompressOptimizedPixelDataCheckBox.Checked = fsFormat.CompressOptimizedPixelData;
 
-            if (fsFormat.FileFormat == FileFormat.BasicImage)
-            {
-                ImageFileRadioButton.Checked = true;
-                SingleFileRadioButton.Checked = false;
-            }
-            else
-            {
-                ImageFileRadioButton.Checked = false;
-                SingleFileRadioButton.Checked = true;
-            }
+            SelectFileFormat(m_project.ImageBuilderSettings.FileSystemFormat.FileFormat);
 
             if (m_project.ImageBuilderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB565)
             {
@@ -437,8 +426,15 @@ namespace IRL_Image_Creator.Windows
         {
             if (ImageFileRadioButton.Checked)
             {
-                SingleFileRadioButton.Checked = false;
-                m_project.ImageBuilderSettings.FileSystemFormat.FileFormat = FileFormat.BasicImage;
+                SelectFileFormat(FileFormat.BasicImage);
+            }
+        }
+
+        private void OptimizedImageRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (OptimizedImageRadioButton.Checked)
+            {
+                SelectFileFormat(FileFormat.OptimizedImage);
             }
         }
 
@@ -446,14 +442,44 @@ namespace IRL_Image_Creator.Windows
         {
             if (SingleFileRadioButton.Checked)
             {
-                ImageFileRadioButton.Checked = false;
-                m_project.ImageBuilderSettings.FileSystemFormat.FileFormat = FileFormat.SingleFile;
+                SelectFileFormat(FileFormat.SingleFile);
             }
+        }
+
+        private void SelectFileFormat(FileFormat fileformat)
+        {
+            switch (fileformat)
+            {
+                case FileFormat.BasicImage:
+                    ImageFileRadioButton.Checked = true;
+                    SingleFileRadioButton.Checked = false;
+                    OptimizedImageRadioButton.Checked = false;
+                    break;
+                case FileFormat.SingleFile:
+                    ImageFileRadioButton.Checked = false;
+                    SingleFileRadioButton.Checked = true;
+                    OptimizedImageRadioButton.Checked = false;
+                    break;
+                case FileFormat.OptimizedImage:
+                    ImageFileRadioButton.Checked = false;
+                    SingleFileRadioButton.Checked = false;
+                    OptimizedImageRadioButton.Checked = true;
+                    break;
+                default:
+                    break;
+            }
+
+            m_project.ImageBuilderSettings.FileSystemFormat.FileFormat = fileformat;
         }
 
         private void IncludeFileInfoInImageCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             m_project.ImageBuilderSettings.FileSystemFormat.SeparateSearchTreeFromData = !IncludeFileInfoInImageCheckbox.Checked;
+        }
+
+        private void CompressBasicImagePixeldataCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            m_project.ImageBuilderSettings.FileSystemFormat.CompressBasicImagePixelData = CompressBasicImagePixeldataCheckBox.Checked;
         }
 
         private void IncludeWidthAndHeightCheckbox_CheckedChanged(object sender, EventArgs e)
@@ -464,6 +490,16 @@ namespace IRL_Image_Creator.Windows
         private void IncludeCharInfoInImageCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             m_project.ImageBuilderSettings.FontDataInImage = IncludeCharInfoInImageCheckBox.Checked;
+        }
+
+        private void CreatePixelDataFileCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            m_project.ImageBuilderSettings.FileSystemFormat.CreatePixelDataFile = CreatePixelDataFileCheckBox.Checked;
+        }
+
+        private void CompressOptimizedPixelDataCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            m_project.ImageBuilderSettings.FileSystemFormat.CompressOptimizedPixelData = CompressOptimizedPixelDataCheckBox.Checked;
         }
 
         private void RGB565RadioButton_CheckedChanged(object sender, EventArgs e)
@@ -693,7 +729,7 @@ namespace IRL_Image_Creator.Windows
         private void FontKeyProjectFnRB_CheckedChanged(object sender, EventArgs e)
         {
             FontInstruction fontInstruction = FontInstructionHelper.GetFontInstruction(m_project.Instructions);
-            
+
             if ((fontInstruction != null) && FontKeyProjectFnRB.Checked)
             {
                 fontInstruction.FontFileKeyFormat = FontFileKeyFormat.ProjectFontName;
@@ -713,7 +749,7 @@ namespace IRL_Image_Creator.Windows
         private void FontKeyBothRB_CheckedChanged(object sender, EventArgs e)
         {
             FontInstruction fontInstruction = FontInstructionHelper.GetFontInstruction(m_project.Instructions);
-            
+
             if ((fontInstruction != null) && FontKeyBothRB.Checked)
             {
                 fontInstruction.FontFileKeyFormat = FontFileKeyFormat.Both;

@@ -13,7 +13,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
     public static class IconConverter
     {
         public static bool ConvertSvgToBitmaps(
-            SvgFileInfo svgFileInfo, List<IconStyle> iconStyles, ConverterStatusUpdater statusUpdater, string outputFolder)
+            SvgFileInfo svgFileInfo, List<IconStyle> iconStyles, bool bitmapMaskOnly, ConverterStatusUpdater statusUpdater, string outputFolder)
         {
             bool result = true;
 
@@ -41,15 +41,25 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                             XmlDocument xmlDoc = new();
                             xmlDoc.LoadXml(svgFileInfo.SvgString);
 
+                            Color backColor = style.BackColor;
+
                             foreach (ImageSvgColorId svgColor in style.SvgColors)
                             {
-                                SetAttributesColorWithId(xmlDoc, svgColor.Id, svgColor.Color);
+                                Color color = svgColor.Color;
+
+                                if (bitmapMaskOnly)
+                                {
+                                    color = Color.Black;
+                                    backColor = Color.White;
+                                }
+
+                                SetAttributesColorWithId(xmlDoc, svgColor.Id, color);
                             }
 
                             SvgDocument svgDocument = SvgDocument.FromSvg<SvgDocument>(xmlDoc.InnerXml);
                             Bitmap bitmap = svgDocument.Draw();
 
-                            SaveBitmapWithMargin(bitmap, style.Margin, style.BackColor, filePath);
+                            SaveBitmapWithMargin(bitmap, style.Margin, backColor, filePath);
                         }
                         catch (Exception e)
                         {

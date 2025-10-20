@@ -1,4 +1,5 @@
 ﻿using IRL_Common_Library.Utils;
+using IRL_Gui_Image_Builder_Library.Exceptions;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
 using IRL_Gui_Image_Builder_Library.Projects;
 using System.Drawing;
@@ -23,6 +24,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
         public byte[] CharInfoSearchData => m_charInfoSearchData;
         public int CharInfoOffset { get; set; } = 0;
         public List<FsFont> Fonts => m_fonts;
+        public bool HasNumberOnlyFonts { get; set; } = false;
 
         public bool CreateFonts()
         {
@@ -36,6 +38,32 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
                 {
                     CreateFont(fontId, dirInfo);
                     fontId += 1;
+                }
+            }
+
+            return m_fonts.Count > 0;
+        }
+
+        public bool CreatOptimizedFonts()
+        {
+            DirectoryInfo directoryInfoRoot = new(BuildFolders.FontInputFolderPath(m_projectPath));
+            DirectoryInfo[] directoryInfos = directoryInfoRoot.GetDirectories();
+
+            if (directoryInfos.Length != 0)
+            {
+                ushort fontId = 0;
+                foreach (DirectoryInfo dirInfo in directoryInfos)
+                {
+                    CreateFont(fontId, dirInfo);
+                    fontId += 1;
+                }
+            }
+
+            foreach (FsFont font in m_fonts)
+            {
+                foreach(CharacterInfo characterInfo in font.CharacterInfos)
+                {
+                    characterInfo.DataCompression = FontDataCompression.SourcePixelDataFileOptimized;
                 }
             }
 
@@ -79,6 +107,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
             try
             {
                 isNumberOnly = IsFontNumberOnly(ref fileInfos);
+                HasNumberOnlyFonts = true;
             }
             catch (ArgumentException e)
             {
@@ -93,7 +122,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
             AddCharacterInfos(font, ref fileInfos);
         }
 
-        private void AddCharacterInfos(FsFont font, ref FileInfo[] fileInfos)
+        private static void AddCharacterInfos(FsFont font, ref FileInfo[] fileInfos)
         {
             foreach (FileInfo fileInfo in fileInfos)
             {
@@ -111,7 +140,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
             {
                 return false;
             }
-            else if (fileInfos.Length == 10)
+            else if (fileInfos.Length == 12)    // 0-9 . ,
             {
                 return true;
             }
@@ -121,52 +150,91 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
             }
         }
 
-        public void AddPixelData(ref byte[] pixelData, int offset, ref byte[] externalDisplayPixelData)
+        public void AddPixelData(ref byte[] pixelData, int offset)
         {
             foreach (FsFont font in m_fonts)
             {
                 m_statusUpdater.UpdateStatusAndFilesConverted("Converting Font pixeldata: " + font.Name, 95);
-                AddFontPixelData(font, ref pixelData, offset, ref externalDisplayPixelData);
+                AddFontPixelData(font, m_builderSettings.PixelDataFormat, ref pixelData, offset);
             }
         }
 
-        private void AddFontPixelData(FsFont font, ref byte[] fontPixelData, int offset, ref byte[] externalDisplayPixelData)
+        private static void AddFontPixelData(FsFont font, PixelDataFormat pixelDataFormat, ref byte[] fontPixelData, int offset)
         {
             foreach (CharacterInfo charInfo in font.CharacterInfos)
             {
-                if (FileUtils.CanImportFile(charInfo.FileExtension))
+                if (!FileUtils.CanImportFile(charInfo.FileExtension))
+                {
+                    Log.Error($"Cannot import file: {charInfo.FilePath} with extension: {charInfo.FileExtension}");
+                    throw new ImageBuilderException($"Cannot import font character bitmap: {charInfo.ASSCI}");
+                }
+
+                if (charInfo.DataCompression == FontDataCompression.None)
                 {
                     using Bitmap bitmap = new(charInfo.FilePath, true);
-
                     int dataOffset = fontPixelData.Length;
-                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData_1(
-                        bitmap, m_builderSettings.PixelDataFormat);
+
+                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData(bitmap, pixelDataFormat);
 
                     ArrayUtils.AppendToArray(ref fontPixelData, convertedPixelData);
+                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
+                }
+                else if (charInfo.DataCompression == FontDataCompression.PixelDataFileOptimized)
+                {
+                    using Bitmap bitmap = new(charInfo.FilePath, true);
+                    uint compressedPixels = 0;
+                    int dataOffset = fontPixelData.Length;
 
-                    AddExternalDisplayPixelData(ref externalDisplayPixelData, bitmap);
+                    byte[] convertedPixelData = PixelDataConverter.GetCompressedPixelData(bitmap, pixelDataFormat, ref compressedPixels);
 
-                    charInfo.Width = (ushort)bitmap.Width;
-                    charInfo.Height = (ushort)bitmap.Height;
-                    charInfo.DataSize = (uint)convertedPixelData.Length;
-                    charInfo.DataOffset = (uint)(dataOffset + offset);
+                    ArrayUtils.AppendToArray(ref fontPixelData, convertedPixelData);
+                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
+                }
+                else
+                {
                 }
             }
         }
 
-        private static void AddExternalDisplayPixelData(ref byte[] externalDisplayPixelData, Bitmap bitmap)
+        public void AddOptimizedPixelData(ref byte[] pixelData, int offset)
         {
-            PixelDataFormat externDisplayFormat = new();
-            externDisplayFormat.PixelFormat = PixelFormat.RGB;
-            byte[] bitmapPixelData = PixelDataConverter.GetConvertedPixelData_1(bitmap, externDisplayFormat);
-            ArrayUtils.AppendToArray(ref externalDisplayPixelData, bitmapPixelData);
+            foreach (FsFont font in m_fonts)
+            {
+                m_statusUpdater.UpdateStatusAndFilesConverted("Converting Font pixeldata: " + font.Name, 95);
+                AddOptimizedFontPixelData(font, m_builderSettings.PixelDataFormat, ref pixelData, offset);
+            }
         }
 
-        private void SortCharacterSet(FsFont font)
+        private static void AddOptimizedFontPixelData(FsFont font, PixelDataFormat pixelDataFormat, ref byte[] fontPixelData, int offset)
+        {
+            foreach (CharacterInfo charInfo in font.CharacterInfos)
+            {
+                if (!FileUtils.CanImportFile(charInfo.FileExtension))
+                {
+                    Log.Error($"Cannot import file: {charInfo.FilePath} with extension: {charInfo.FileExtension}");
+                    throw new ImageBuilderException($"Cannot import font character bitmap: {charInfo.ASSCI}");
+                }
+
+                if (charInfo.DataCompression == FontDataCompression.SourcePixelDataFileOptimized)
+                {
+                    using Bitmap bitmap = new(charInfo.FilePath, true);
+                    int dataOffset = fontPixelData.Length;
+
+                    byte[] convertedPixelData = PixelDataConverter.GetOptimizedPixelData(bitmap);
+                    uint compressedPixels = (uint)(convertedPixelData.Length / 2);
+                    ArrayUtils.AppendToArray(ref fontPixelData, convertedPixelData);
+
+                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length, compressedPixels);
+                }
+                else
+                {
+                }
+            }
+        }
+
+        private static void SortCharacterSet(FsFont font)
         {
             font.CharacterInfos.Sort((x, y) => x.ASSCI.CompareTo(y.ASSCI));
-            //folder.FsFileInfos.Sort((x, y) => y.FileId.CompareTo(x.FileId));
-            //m_fileInfoList.Sort((x, y) => x.FileId.CompareTo(y.FileId));
         }
     }
 }

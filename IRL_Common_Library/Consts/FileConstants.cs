@@ -34,6 +34,7 @@
         public const string CharInfoSearchFile = "fs_font_search";
         public const string BitmapDataFile = "fs_bitmap_data";
         public const string ColorFile = "fs_colors";
+        public const string PixelDataFile = "fs_pixeldata";
 
 
         // C Files crclib

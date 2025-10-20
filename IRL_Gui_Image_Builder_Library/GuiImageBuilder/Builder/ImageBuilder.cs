@@ -2,18 +2,28 @@
 using IRL_Common_Library.CRC;
 using IRL_Common_Library.Utils;
 using IRL_Gui_Image_Builder_Library.CodeGeneration;
+using IRL_Gui_Image_Builder_Library.CodeGeneration.FontSearchFiles;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
 using IRL_Gui_Image_Builder_Library.Converters;
+using IRL_Gui_Image_Builder_Library.Exceptions;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSystemBasic;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts;
 using IRL_Gui_Image_Builder_Library.Projects;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
 {
     public class ImageBuilder
     {
+        private struct ImageFileInfo
+        {
+            public int sizeofVersionNumber;
+            public int pixelInfoSize;
+            public int fileInfoSize;
+            public int charInfoSize;
+            public int startDataOffset;
+        }
+
         public static string StartConvertingBmps(
             ImageBuilderSettings builderSettings, List<FSColor> fsColors, BuilderStatusUpdater statusUpdater,
             string projectPath, string userSourcePath)
@@ -38,6 +48,10 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             {
                 message = CreateImageBasicFileSystem(builderSettings, fsColors, statusUpdater, projectPath, userSourcePath);
             }
+            else if (builderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage)
+            {
+                message = CreateImageOptimizedFileSystem(builderSettings, fsColors, statusUpdater, projectPath, userSourcePath);
+            }
             else
             {
                 message = "Unsupported FileFormat";
@@ -48,52 +62,33 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             return message;
         }
 
-        public static void UpdateProgress(string progress)
-        {
-            Debug.WriteLine(progress);
-        }
-
         private static string CreateImageBasicFileSystem(
             ImageBuilderSettings builderSettings, List<FSColor> fsColors, BuilderStatusUpdater statusUpdater,
             string projectPath, string userSourcePath)
         {
             FsbBuilder fsbBuilder = new(builderSettings, projectPath, statusUpdater);
-            bool fileSystemBuild = fsbBuilder.BuildFileSystem();
+            bool fileSystemBuild = fsbBuilder.BuildBasicFileSystem();
 
             FontBuilder fontBuilder = new(builderSettings, projectPath, statusUpdater);
             bool fontsCreated = fontBuilder.CreateFonts();
 
             if (fileSystemBuild || fontsCreated)
             {
-                int sizeofVersionNumber = sizeof(uint) * 4;
-                int pixelEncodingSize = 2;
+                ImageFileInfo imageInfo = GetImageFileInfo(builderSettings, fsbBuilder.FileInfoSize, fontBuilder.CharacterInfoSize);
+                byte[] pixelData = [];
 
-                int fileInfoSize = builderSettings.FileSystemFormat.SeparateSearchTreeFromData ? 0 : fsbBuilder.FileInfoSize;
-                int charInfoSize = builderSettings.FontDataInImage ? fontBuilder.CharacterInfoSize : 0;
-                int startDataOffset = sizeofVersionNumber + pixelEncodingSize + charInfoSize + fileInfoSize;
-
-                byte[] pixelData = Array.Empty<byte>();
-                byte[] externalDisplayPixelData = Array.Empty<byte>();
-
-                fsbBuilder.ConvertAllFilesPixelData(ref pixelData, startDataOffset, ref externalDisplayPixelData);
-
-                fontBuilder.AddPixelData(ref pixelData, startDataOffset, ref externalDisplayPixelData);
-                fontBuilder.CharInfoOffset = fileInfoSize;
-                fontBuilder.CreateCharInfoSearchData();
+                fsbBuilder.AddPixelData(ref pixelData, imageInfo.startDataOffset);
+                fontBuilder.AddPixelData(ref pixelData, imageInfo.startDataOffset);
+                fontBuilder.CharInfoOffset = imageInfo.fileInfoSize;
 
                 statusUpdater.UpdateStatus("Create Files");
-                CreateBasicImageFiles(builderSettings, projectPath, fsbBuilder, fontBuilder, ref pixelData, ref externalDisplayPixelData);
+                CreateBasicImageFiles(builderSettings, projectPath, fsbBuilder, fontBuilder, ref pixelData);
 
                 BasicFileSystemCodeGenerator.CreateBasicFileSystemFiles(builderSettings, projectPath, fsbBuilder, fsColors);
                 FontCodeGenerator.CreateFontCodeFiles(builderSettings, projectPath, fontBuilder, fsbBuilder.CRC);
-
                 CopySourceFiles(builderSettings, projectPath, userSourcePath);
 
-                string message = fsbBuilder.FsbFileInfos.Count.ToString() + " File(s) and " + fontBuilder.Fonts.Count + " Font(s) added";
-                Log.WriteLine("Build successful");
-                Log.WriteLine("Build V" + builderSettings.GetVerion());
-                Log.WriteLine(message);
-
+                string message = WriteResutlToLogFile(fsbBuilder.FsbFileInfos.Count, fontBuilder.Fonts.Count, builderSettings.GetVerion());
                 builderSettings.IncrementRevision();
 
                 return message;
@@ -101,7 +96,52 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             else
             {
                 Log.Error("Building filesystem aborted.");
-                return "Error building filesystem, check log file.";
+                throw new ImageBuilderException("Error building filesystem, check log file.");
+            }
+        }
+
+        private static string CreateImageOptimizedFileSystem(
+            ImageBuilderSettings builderSettings, List<FSColor> fsColors, BuilderStatusUpdater statusUpdater,
+            string projectPath, string userSourcePath)
+        {
+            FsbBuilder fsbBuilder = new(builderSettings, projectPath, statusUpdater);
+            bool fileSystemBuild = fsbBuilder.BuildOptimizedFileSystem();
+
+            FontBuilder fontBuilder = new(builderSettings, projectPath, statusUpdater);
+            bool fontsCreated = fontBuilder.CreatOptimizedFonts();
+
+            if (fileSystemBuild || fontsCreated)
+            {
+                ImageFileInfo imageInfo = GetImageFileInfo(builderSettings, fsbBuilder.FileInfoSize, fontBuilder.CharacterInfoSize);
+                byte[] codeStoredPixelData = [];
+                byte[] fileStoredPixelData = [];
+
+                fsbBuilder.AddOptimizedPixelData(ref codeStoredPixelData, 0);
+                fsbBuilder.AddPixelData(ref fileStoredPixelData, imageInfo.startDataOffset);
+                fontBuilder.AddOptimizedPixelData(ref codeStoredPixelData, 0);
+
+                statusUpdater.UpdateStatus("Create Files");
+                CreateCodeStoredImageFiles(
+                    builderSettings, projectPath, fsbBuilder, fontBuilder, ref fileStoredPixelData);
+
+                BasicFileSystemCodeGenerator.CreateOptimizedFileSystemFiles(
+                    builderSettings, projectPath, fsbBuilder, fsColors, ref codeStoredPixelData);
+
+                FontCodeGenerator.CreateFontCodeFiles(builderSettings, projectPath, fontBuilder, fsbBuilder.CRC);
+                CopySourceFiles(builderSettings, projectPath, userSourcePath);
+
+                CreateExternalDisplayImageFileCompressed(builderSettings, projectPath, 
+                    ref codeStoredPixelData, ref fileStoredPixelData);
+
+                string message = WriteResutlToLogFile(fsbBuilder.FsbFileInfos.Count, fontBuilder.Fonts.Count, builderSettings.GetVerion());
+                builderSettings.IncrementRevision();
+
+                return message;
+            }
+            else
+            {
+                Log.Error("Building filesystem aborted.");
+                throw new ImageBuilderException("Error building filesystem, check log file.");
             }
         }
 
@@ -150,7 +190,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
 
         private static void ConvertAndWritePixelData(Bitmap bitmap, FileStream fileStream, ImageBuilderSettings builderSettings)
         {
-            byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData_1(bitmap, builderSettings.PixelDataFormat);
+            byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData(bitmap, builderSettings.PixelDataFormat);
             fileStream.Write(convertedPixelData);
         }
 
@@ -163,31 +203,29 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             return filename;
         }
 
-        private static void CreateBasicImageFiles(ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder, FontBuilder fontBuilder, ref byte[] pixelData, ref byte[] externalDisplayPixelData)
+        private static void CreateBasicImageFiles(
+            ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder, FontBuilder fontBuilder, ref byte[] pixelData)
         {
             bool writeFontData = fontBuilder.CharacterInfoSize > 0;
             string version = builderSettings.GetVerion().Replace(".", "_");
             string pixelDataFileName = builderSettings.GuiPixelDataFile + "_" + version;
             string pixelDataFilePath = BuildFolders.BuildFolderPath(projectPath) + "\\" + pixelDataFileName;
 
-            using FileStream imageFile = new(
-                pixelDataFilePath,
-                FileMode.Create, FileAccess.ReadWrite);
-
-            using StreamWriter fileSearchLog = builderSettings.CreateDebugFiles ?
-                new StreamWriter(BuildFolders.LogFolderPath(projectPath) + "\\image_debug.txt") : null;
+            using FileStream imageFile = new(pixelDataFilePath, FileMode.Create, FileAccess.ReadWrite);
+            using StreamWriter fileSearchLog = new(BuildFolders.LogFolderPath(projectPath) + "\\image_debug.txt");
 
             uint crc = WriteVersionNumberToImageFile(imageFile, builderSettings);
             AddPixelDataInfo(imageFile, builderSettings);
 
             if (!builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
             {
-                crc = AddBitmapSearchInfoToImageFile(fsbBuilder, imageFile, crc, fileSearchLog);
+                crc = AddBitmapSearchInfoToImageFile(fsbBuilder, imageFile, crc, fileSearchLog, builderSettings.CreateDebugFiles);
             }
 
             if (writeFontData && builderSettings.FontDataInImage)
             {
-                crc = AddFontSearchInfoToImageFile(fontBuilder, imageFile, crc, fileSearchLog);
+                fontBuilder.CreateCharInfoSearchData();
+                crc = AddFontSearchInfoToImageFile(fontBuilder, imageFile, crc, fileSearchLog, builderSettings.CreateDebugFiles);
             }
 
             Log.WriteLine("Pixeldata offset: " + imageFile.Position);
@@ -203,6 +241,62 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             fileSearchLog?.Close();
         }
 
+        private static string WriteResutlToLogFile(int noOfFiles, int noOfFonts, string version)
+        {
+            string message = noOfFiles.ToString() + " File(s) and " + noOfFonts + " Font(s) added";
+            Log.WriteLine("Build successful");
+            Log.WriteLine("Build V" + version);
+            Log.WriteLine(message);
+
+            return message;
+        }
+
+        private static void CreateCodeStoredImageFiles(
+            ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder, FontBuilder fontBuilder, ref byte[] dataFilePixelData)
+        {
+            bool writeFontData = fontBuilder.CharacterInfoSize > 0;
+            string version = builderSettings.GetVerion().Replace(".", "_");
+            string pixelDataFileName = builderSettings.GuiPixelDataFile + "_" + version;
+            string pixelDataFilePath = BuildFolders.BuildFolderPath(projectPath) + "\\" + pixelDataFileName;
+
+            using FileStream imageFile = new(pixelDataFilePath, FileMode.Create, FileAccess.ReadWrite);
+
+            uint crc = WriteVersionNumberToImageFile(imageFile, builderSettings);
+            AddPixelDataInfo(imageFile, builderSettings);
+
+            Log.WriteLine("Pixeldata offset: " + imageFile.Position);
+
+            crc = CRC32.GetCrc32Accumulate(crc, ref dataFilePixelData, dataFilePixelData.Length);
+            fsbBuilder.CRC = crc;
+            imageFile.Write(dataFilePixelData);
+
+            Log.WriteLine("CRC: " + crc);
+
+            imageFile.Write(BitConverter.GetBytes(crc));
+        }
+
+        private static void CreateExternalDisplayImageFileCompressed(
+            ImageBuilderSettings builderSettings, string projectPath, 
+            ref byte[] optimizedPixelData, ref byte[] pixelData)
+        {
+            string version = builderSettings.GetVerion().Replace(".", "_");
+            string filePath = $"{BuildFolders.BuildFolderPath(projectPath)}\\{FileConstants.ExternalDisplayFile}_{version}";
+
+            using FileStream externalDisplayImageFile = new(filePath, FileMode.Create, FileAccess.ReadWrite);
+            using StreamWriter fileSearchLog = new(BuildFolders.LogFolderPath(projectPath) + "\\image_debug.txt");
+
+            WriteVersionNumberToImageFile(externalDisplayImageFile, builderSettings);
+            AddPixelDataInfo(externalDisplayImageFile, builderSettings);
+
+            externalDisplayImageFile.Write(pixelData);
+            uint startOffset = (uint)externalDisplayImageFile.Position;
+            externalDisplayImageFile.Write(optimizedPixelData);
+            externalDisplayImageFile.Write(BitConverter.GetBytes(startOffset));
+
+            //externalDisplayImageFile.Write(BitConverter.GetBytes(fsbBuilder.CRC));
+            externalDisplayImageFile.Close();
+        }
+
         private static void CreateExternalDisplayImageFile(ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder, FontBuilder fontBuilder, ref byte[] pixelData)
         {
             bool writeFontData = fontBuilder.CharacterInfoSize > 0;
@@ -210,17 +304,18 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             string filePath = $"{BuildFolders.BuildFolderPath(projectPath)}\\{FileConstants.ExternalDisplayFile}_{version}";
 
             using FileStream externalDisplayImageFile = new(filePath, FileMode.Create, FileAccess.ReadWrite);
+            using StreamWriter fileSearchLog = new(BuildFolders.LogFolderPath(projectPath) + "\\image_debug.txt");
 
             WriteVersionNumberToImageFile(externalDisplayImageFile, builderSettings);
 
             if (!builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
             {
-                AddBitmapSearchInfoToImageFile(fsbBuilder, externalDisplayImageFile, 0, null);
+                AddBitmapSearchInfoToImageFile(fsbBuilder, externalDisplayImageFile, 0, fileSearchLog, false);
             }
 
             if (writeFontData && builderSettings.FontDataInImage)
             {
-                AddFontSearchInfoToImageFile(fontBuilder, externalDisplayImageFile, 0, null);
+                AddFontSearchInfoToImageFile(fontBuilder, externalDisplayImageFile, 0, fileSearchLog, false);
             }
 
             externalDisplayImageFile.Write(pixelData);
@@ -252,8 +347,11 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
         {
             byte[] bytesPerPixel = new byte[1];
             byte[] pixelFormat = new byte[1];
+            byte[] compressed = new byte[2];
 
-            bytesPerPixel[0] = builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? (byte)3 : (byte)2;
+            compressed[0] = builderSettings.FileSystemFormat.CompressBasicImagePixelData ? (byte)1 : (byte)0;
+            compressed[1] = (byte)((builderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage) ? 1 : 0);
+            bytesPerPixel[0] = builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? (byte)3 : (byte)2;           
 
             if (builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB)
             {
@@ -280,28 +378,34 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
 
             imageFile.Write(bytesPerPixel, 0, bytesPerPixel.Length);
             imageFile.Write(pixelFormat, 0, pixelFormat.Length);
+            imageFile.Write(compressed, 0, compressed.Length);
         }
 
-        private static uint AddBitmapSearchInfoToImageFile(FsbBuilder fsbBuilder, FileStream imageFile, uint crc, StreamWriter fileSearchLog)
+        private static uint AddBitmapSearchInfoToImageFile(
+            FsbBuilder fsbBuilder, FileStream imageFile, uint crc, StreamWriter fileSearchLog, bool writeDebugFile)
         {
             byte[] fileSearchData = fsbBuilder.FileInfoSearchData;
-            for (int i = 0; i < fileSearchData.Length; i += fsbBuilder.SizeOfFileInfo)
+
+            if (writeDebugFile)
             {
-                if (fsbBuilder.SizeOfFileInfo == 8)
+                for (int i = 0; i < fileSearchData.Length; i += fsbBuilder.SizeOfFileInfo)
                 {
-                    fileSearchLog?.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + BitConverter.ToUInt16(fileSearchData, i + 4) + " " + BitConverter.ToUInt16(fileSearchData, i + 6));
-                }
-                else if (fsbBuilder.SizeOfFileInfo == 9)
-                {
-                    fileSearchLog?.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + fileSearchData[i + 4] + " " + BitConverter.ToUInt16(fileSearchData, i + 5) + " " + BitConverter.ToUInt16(fileSearchData, i + 7));
-                }
-                else if (fsbBuilder.SizeOfFileInfo == 10)
-                {
-                    fileSearchLog?.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + BitConverter.ToUInt16(fileSearchData, i + 4) + " " + BitConverter.ToUInt16(fileSearchData, i + 6) + " " + BitConverter.ToUInt16(fileSearchData, i + 8));
-                }
-                else
-                {
-                    Log.Error("Writing image_debug.txt");
+                    if (fsbBuilder.SizeOfFileInfo == 8)
+                    {
+                        fileSearchLog.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + BitConverter.ToUInt16(fileSearchData, i + 4) + " " + BitConverter.ToUInt16(fileSearchData, i + 6));
+                    }
+                    else if (fsbBuilder.SizeOfFileInfo == 9)
+                    {
+                        fileSearchLog.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + fileSearchData[i + 4] + " " + BitConverter.ToUInt16(fileSearchData, i + 5) + " " + BitConverter.ToUInt16(fileSearchData, i + 7));
+                    }
+                    else if (fsbBuilder.SizeOfFileInfo == 10)
+                    {
+                        fileSearchLog.WriteLine("(" + i + ") " + BitConverter.ToUInt32(fileSearchData, i) + " " + BitConverter.ToUInt16(fileSearchData, i + 4) + " " + BitConverter.ToUInt16(fileSearchData, i + 6) + " " + BitConverter.ToUInt16(fileSearchData, i + 8));
+                    }
+                    else
+                    {
+                        Log.Error("Writing image_debug.txt");
+                    }
                 }
             }
 
@@ -311,11 +415,15 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             return crc;
         }
 
-        private static uint AddFontSearchInfoToImageFile(FontBuilder fontBuilder, FileStream imageFile, uint crc, StreamWriter fileSearchLog)
+        private static uint AddFontSearchInfoToImageFile(
+            FontBuilder fontBuilder, FileStream imageFile, uint crc, StreamWriter fileSearchLog, bool writeDebugFiles)
         {
-            for (int i = 0; i < fontBuilder.CharInfoSearchData.Length; i += 6)
+            if (writeDebugFiles)
             {
-                fileSearchLog?.WriteLine("(" + (imageFile.Position + i).ToString() + ") " + BitConverter.ToInt32(fontBuilder.CharInfoSearchData, i) + " " + fontBuilder.CharInfoSearchData[i + 4] + " " + fontBuilder.CharInfoSearchData[i + 5]);
+                for (int i = 0; i < fontBuilder.CharInfoSearchData.Length; i += 6)
+                {
+                    fileSearchLog?.WriteLine("(" + (imageFile.Position + i).ToString() + ") " + BitConverter.ToInt32(fontBuilder.CharInfoSearchData, i) + " " + fontBuilder.CharInfoSearchData[i + 4] + " " + fontBuilder.CharInfoSearchData[i + 5]);
+                }
             }
 
             Log.WriteLine("Font info offset: " + imageFile.Position);
@@ -379,5 +487,171 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder
             }
         }
 
+        private static ImageFileInfo GetImageFileInfo(ImageBuilderSettings builderSettings, int fileInfoSize, int charInfoSize)
+        {
+            int sizeofVersionNumberBytes = sizeof(uint) * 4;
+            int pixelInfoSizeBytes = 4;
+            int fileInfoSizeBytes = builderSettings.FileSystemFormat.SeparateSearchTreeFromData ? 0 : fileInfoSize;
+            int charInfoSizeBytes = builderSettings.FontDataInImage ? charInfoSize : 0;
+            int startDataOffset = sizeofVersionNumberBytes + pixelInfoSizeBytes + charInfoSizeBytes + fileInfoSizeBytes;
+
+            return new ImageFileInfo
+            {
+                sizeofVersionNumber = sizeofVersionNumberBytes,
+                pixelInfoSize = pixelInfoSizeBytes,
+                fileInfoSize = fileInfoSizeBytes,
+                charInfoSize = charInfoSizeBytes,
+                startDataOffset = startDataOffset
+            };
+        }
     }
 }
+
+
+
+
+//private static void CompressImageFile(FsbBuilder fsbBuilder, FontBuilder fontBuilder, ref byte[] pixelData, string pixelDataFilePath, string projectPath)
+//{
+//    using FileStream compressedFile = new(
+//        pixelDataFilePath + ".comp",
+//        FileMode.Create, FileAccess.ReadWrite);
+
+//    uint sizeCompressedData = 0;
+//    const uint startDataOffset = 18;
+//    uint writeIndex = 0;
+
+//    foreach (FsbFileInfo fileInfo in fsbBuilder.FsbFileInfos)
+//    {
+//        uint legthBytes = (uint)(fileInfo.FsbFile.Width * fileInfo.FsbFile.Height * 3);
+//        sizeCompressedData = CompressBitmapPixelData(fileInfo.FsbFile.DataOffset - startDataOffset, legthBytes, ref pixelData, compressedFile);
+//        fileInfo.FsbFile.DataOffset = writeIndex;
+
+//        writeIndex += sizeCompressedData;
+//    }
+
+//    foreach (FsFont font in fontBuilder.Fonts)
+//    {
+//        foreach (CharacterInfo charInfo in font.CharacterInfos)
+//        {
+//            uint legthBytes = (uint)(charInfo.Width * charInfo.Height * 3);
+//            sizeCompressedData = CompressBitmapPixelData(charInfo.DataOffset - startDataOffset, legthBytes, ref pixelData, compressedFile);
+//            charInfo.DataOffset = writeIndex;
+
+//            writeIndex += sizeCompressedData;
+//        }
+//    }
+
+//    compressedFile.Position = 0;
+
+//    StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + "comprdata" + ".c");
+
+
+//    for (int i = 0; i < compressedFile.Length; i++)
+//    {
+//        sw.Write(compressedFile.ReadByte() + ",");
+//        if ((i + 1) % 64 == 0)
+//        {
+//            sw.WriteLine("");
+//        }
+//    }
+
+//    sw.Close();
+
+//    compressedFile.Close();
+//}
+
+//private static uint CompressBitmapPixelData(uint offset, uint lengthBytes, ref byte[] pixelData, FileStream compressedFile)
+//{
+//    ushort currentPixel = 0xFFFF;
+//    ushort pixelCount = 0;
+//    uint totalSize = 0;
+
+//    for (uint i = offset; i < (offset + lengthBytes); i += 3)
+//    {
+//        byte pixel = pixelData[i];
+
+//        if (pixel == currentPixel)
+//        {
+//            if (pixelCount < 256)
+//            {
+//                pixelCount++;
+//            }
+//            else
+//            {
+//                AddPixelInfo(compressedFile, (byte)(pixelCount - 1), (byte)currentPixel, ref totalSize);
+
+//                currentPixel = pixel;
+//                pixelCount = 1;
+//            }
+//        }
+//        else if (currentPixel == 0xFFFF)
+//        {
+//            currentPixel = pixel;
+//            pixelCount = 1;
+//        }
+//        else
+//        {
+//            AddPixelInfo(compressedFile, (byte)(pixelCount - 1), (byte)currentPixel, ref totalSize);
+
+//            currentPixel = pixel;
+//            pixelCount = 1;
+//        }
+//    }
+
+//    AddPixelInfo(compressedFile, (byte)(pixelCount - 1), (byte)currentPixel, ref totalSize);
+
+//    return totalSize;
+//}
+
+//private static void AddPixelInfo(FileStream compressedFile, byte pixelCount, byte colorCode, ref uint size)
+//{
+//    compressedFile.WriteByte(pixelCount);
+//    compressedFile.WriteByte(colorCode);
+//    size += 2;
+//}
+
+
+//private static uint CompressBitmapPixelData(uint offset, uint lengthBytes, ref byte[] pixelData, FileStream compressedFile)
+//{
+//    ushort currentPixel = pixelData[offset];
+//    byte pixelCount = 1;
+//    uint totalSize = 0;
+
+//    for (uint i = offset + 3; i < (offset + lengthBytes); i += 3)
+//    {
+//        byte pixel = pixelData[i];
+
+//        if (pixel == currentPixel)
+//        {
+//            if (pixelCount < 0xFF)
+//            {
+//                pixelCount++;
+//            }
+//            else
+//            {
+//                compressedFile.WriteByte(pixelCount);
+//                compressedFile.WriteByte(currentPixel);
+//                totalSize += 2; // 1 byte for count, 1 byte for pixel value
+
+//                currentPixel = pixel;
+//                pixelCount = 1;
+
+//            }
+//        }
+//        else
+//        {
+//            compressedFile.WriteByte(pixelCount);
+//            compressedFile.WriteByte(currentPixel);
+//            totalSize += 2;
+
+//            currentPixel = pixel;
+//            pixelCount = 1;
+//        }
+//    }
+
+//    compressedFile.WriteByte(pixelCount);
+//    compressedFile.WriteByte(currentPixel);
+//    totalSize += 2; // Last pixel count and value
+
+//    return totalSize;
+//}

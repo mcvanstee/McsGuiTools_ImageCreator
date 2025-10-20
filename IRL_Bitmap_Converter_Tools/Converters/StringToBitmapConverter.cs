@@ -94,7 +94,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             {
                 for (int y = 0; y < bitmap.Height; y++)
                 {
-                    if (backColor != bitmap.GetPixel(x, y)) // TODO only compare rgb values!!!
+                    if (!AreColorsEqual(backColor, bitmap.GetPixel(x, y)))// backColor != bitmap.GetPixel(x, y)) // TODO only compare rgb values!!!
                     {
                         xLeft = x;
                         break;
@@ -118,7 +118,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             {
                 for (int y = (bitmap.Height - 1); y >= 0; y--)
                 {
-                    if (backColor != bitmap.GetPixel(x, y))
+                    if (!AreColorsEqual(backColor, bitmap.GetPixel(x, y)))//backColor != bitmap.GetPixel(x, y))
                     {
                         xRight = x;
                         break;

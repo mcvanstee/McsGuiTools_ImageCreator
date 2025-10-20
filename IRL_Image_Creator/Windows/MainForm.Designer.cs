@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             statusStrip = new StatusStrip();
             progressBar = new ToolStripProgressBar();
@@ -89,9 +90,10 @@
             EditFontButton = new Button();
             SelectFontStyleButton = new Button();
             panel9 = new Panel();
+            groupBox5 = new GroupBox();
+            FontKeyProjectFnRB = new RadioButton();
             FontKeyBothRB = new RadioButton();
             FontKeyFontnameRB = new RadioButton();
-            FontKeyProjectFnRB = new RadioButton();
             ImageTab = new TabPage();
             tableLayoutPanel12 = new TableLayoutPanel();
             tableLayoutPanel11 = new TableLayoutPanel();
@@ -114,7 +116,6 @@
             columnHeader6 = new ColumnHeader();
             columnHeader4 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
-            splitter2 = new Splitter();
             panel3 = new Panel();
             tableLayoutPanel6 = new TableLayoutPanel();
             panelWithBorder3 = new IRL_Image_Creator.CustomComponents.Panels.PanelWithBorder();
@@ -127,6 +128,10 @@
             FontFormatGroupBox = new GroupBox();
             IncludeCharInfoInImageCheckBox = new CheckBox();
             FileFormatGroupBox = new GroupBox();
+            CompressBasicImagePixeldataCheckBox = new CheckBox();
+            CompressOptimizedPixelDataCheckBox = new CheckBox();
+            CreatePixelDataFileCheckBox = new CheckBox();
+            OptimizedImageRadioButton = new RadioButton();
             IncludeFileInfoInImageCheckbox = new CheckBox();
             SingleFileRadioButton = new RadioButton();
             IncludeWidthAndHeightCheckbox = new CheckBox();
@@ -150,12 +155,11 @@
             BuildAllButton = new Button();
             CreateBitmapsButton = new Button();
             CreateImageButton = new Button();
-            splitter1 = new Splitter();
             panel6 = new Panel();
             FontDialog = new FontDialog();
             FileDialog = new OpenFileDialog();
             folderBrowserDialog = new FolderBrowserDialog();
-            groupBox5 = new GroupBox();
+            toolTipMainForm = new ToolTip(components);
             statusStrip.SuspendLayout();
             menuStrip1.SuspendLayout();
             MainTableLayoutPanel.SuspendLayout();
@@ -177,6 +181,7 @@
             tableLayoutPanel5.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
             panel9.SuspendLayout();
+            groupBox5.SuspendLayout();
             ImageTab.SuspendLayout();
             tableLayoutPanel12.SuspendLayout();
             tableLayoutPanel11.SuspendLayout();
@@ -201,16 +206,15 @@
             ((System.ComponentModel.ISupportInitialize)VersionMinorInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)VersionMajorInput).BeginInit();
             groupBox7.SuspendLayout();
-            groupBox5.SuspendLayout();
             SuspendLayout();
             // 
             // statusStrip
             // 
             statusStrip.ImageScalingSize = new Size(20, 20);
             statusStrip.Items.AddRange(new ToolStripItem[] { progressBar, statusLabel });
-            statusStrip.Location = new Point(0, 698);
+            statusStrip.Location = new Point(0, 783);
             statusStrip.Name = "statusStrip";
-            statusStrip.Size = new Size(1266, 22);
+            statusStrip.Size = new Size(1334, 22);
             statusStrip.TabIndex = 0;
             statusStrip.Text = "statusStrip1";
             // 
@@ -230,7 +234,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, projectToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1266, 24);
+            menuStrip1.Size = new Size(1334, 24);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -368,28 +372,26 @@
             MainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             MainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100.000008F));
             MainTableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            MainTableLayoutPanel.Size = new Size(1266, 674);
+            MainTableLayoutPanel.Size = new Size(1334, 759);
             MainTableLayoutPanel.TabIndex = 2;
             // 
             // panel1
             // 
             panel1.Controls.Add(panel4);
-            panel1.Controls.Add(splitter2);
             panel1.Controls.Add(panel3);
-            panel1.Controls.Add(splitter1);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(3, 23);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1260, 628);
+            panel1.Size = new Size(1328, 713);
             panel1.TabIndex = 0;
             // 
             // panel4
             // 
             panel4.Controls.Add(SelectedInstrTabControl);
             panel4.Dock = DockStyle.Fill;
-            panel4.Location = new Point(3, 0);
+            panel4.Location = new Point(0, 0);
             panel4.Name = "panel4";
-            panel4.Size = new Size(954, 628);
+            panel4.Size = new Size(992, 713);
             panel4.TabIndex = 4;
             // 
             // SelectedInstrTabControl
@@ -401,9 +403,8 @@
             SelectedInstrTabControl.Location = new Point(0, 0);
             SelectedInstrTabControl.Name = "SelectedInstrTabControl";
             SelectedInstrTabControl.SelectedIndex = 0;
-            SelectedInstrTabControl.Size = new Size(954, 628);
+            SelectedInstrTabControl.Size = new Size(992, 713);
             SelectedInstrTabControl.TabIndex = 0;
-            SelectedInstrTabControl.SelectedIndexChanged += SelectedInstrTabControl_SelectedIndexChanged;
             // 
             // TextTab
             // 
@@ -411,7 +412,7 @@
             TextTab.Location = new Point(4, 24);
             TextTab.Name = "TextTab";
             TextTab.Padding = new Padding(3, 3, 3, 0);
-            TextTab.Size = new Size(946, 600);
+            TextTab.Size = new Size(984, 685);
             TextTab.TabIndex = 0;
             TextTab.Text = "Text";
             TextTab.UseVisualStyleBackColor = true;
@@ -423,16 +424,16 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(940, 597);
+            panel2.Size = new Size(978, 682);
             panel2.TabIndex = 5;
             // 
             // panel7
             // 
             panel7.Controls.Add(tableLayoutPanel1);
             panel7.Dock = DockStyle.Fill;
-            panel7.Location = new Point(170, 0);
+            panel7.Location = new Point(182, 0);
             panel7.Name = "panel7";
-            panel7.Size = new Size(770, 597);
+            panel7.Size = new Size(796, 682);
             panel7.TabIndex = 1;
             // 
             // tableLayoutPanel1
@@ -447,7 +448,7 @@
             tableLayoutPanel1.RowCount = 2;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 54F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(770, 597);
+            tableLayoutPanel1.Size = new Size(796, 682);
             tableLayoutPanel1.TabIndex = 4;
             // 
             // InputTextFileGroupBox
@@ -458,7 +459,7 @@
             InputTextFileGroupBox.Dock = DockStyle.Fill;
             InputTextFileGroupBox.Location = new Point(3, 3);
             InputTextFileGroupBox.Name = "InputTextFileGroupBox";
-            InputTextFileGroupBox.Size = new Size(764, 48);
+            InputTextFileGroupBox.Size = new Size(790, 48);
             InputTextFileGroupBox.TabIndex = 2;
             InputTextFileGroupBox.TabStop = false;
             InputTextFileGroupBox.Text = "Text";
@@ -473,7 +474,7 @@
             // ImportTextBtn
             // 
             ImportTextBtn.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            ImportTextBtn.Location = new Point(683, 16);
+            ImportTextBtn.Location = new Point(709, 16);
             ImportTextBtn.Name = "ImportTextBtn";
             ImportTextBtn.Size = new Size(75, 23);
             ImportTextBtn.TabIndex = 2;
@@ -496,7 +497,7 @@
             TextInfoGroupBox.Dock = DockStyle.Fill;
             TextInfoGroupBox.Location = new Point(3, 57);
             TextInfoGroupBox.Name = "TextInfoGroupBox";
-            TextInfoGroupBox.Size = new Size(764, 537);
+            TextInfoGroupBox.Size = new Size(790, 622);
             TextInfoGroupBox.TabIndex = 3;
             TextInfoGroupBox.TabStop = false;
             TextInfoGroupBox.Text = "Text to convert";
@@ -513,7 +514,7 @@
             tableLayoutPanel2.RowCount = 2;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 34F));
-            tableLayoutPanel2.Size = new Size(758, 515);
+            tableLayoutPanel2.Size = new Size(784, 600);
             tableLayoutPanel2.TabIndex = 12;
             // 
             // TextToConvertListView
@@ -524,7 +525,7 @@
             TextToConvertListView.GridLines = true;
             TextToConvertListView.Location = new Point(3, 3);
             TextToConvertListView.Name = "TextToConvertListView";
-            TextToConvertListView.Size = new Size(752, 475);
+            TextToConvertListView.Size = new Size(778, 560);
             TextToConvertListView.TabIndex = 0;
             TextToConvertListView.UseCompatibleStateImageBehavior = false;
             TextToConvertListView.View = View.Details;
@@ -549,11 +550,11 @@
             tableLayoutPanel3.Controls.Add(DeleteTextStyleButton, 2, 0);
             tableLayoutPanel3.Controls.Add(AddTextStyleButton, 3, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 484);
+            tableLayoutPanel3.Location = new Point(3, 569);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(752, 28);
+            tableLayoutPanel3.Size = new Size(778, 28);
             tableLayoutPanel3.TabIndex = 1;
             // 
             // DeleteTextStyleButton
@@ -569,7 +570,7 @@
             // AddTextStyleButton
             // 
             AddTextStyleButton.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            AddTextStyleButton.Location = new Point(639, 3);
+            AddTextStyleButton.Location = new Point(665, 3);
             AddTextStyleButton.Name = "AddTextStyleButton";
             AddTextStyleButton.Size = new Size(110, 22);
             AddTextStyleButton.TabIndex = 9;
@@ -584,7 +585,7 @@
             panel5.Dock = DockStyle.Left;
             panel5.Location = new Point(0, 0);
             panel5.Name = "panel5";
-            panel5.Size = new Size(170, 597);
+            panel5.Size = new Size(182, 682);
             panel5.TabIndex = 0;
             // 
             // TextInstructionListView
@@ -592,7 +593,7 @@
             TextInstructionListView.Dock = DockStyle.Fill;
             TextInstructionListView.Location = new Point(0, 0);
             TextInstructionListView.Name = "TextInstructionListView";
-            TextInstructionListView.Size = new Size(170, 558);
+            TextInstructionListView.Size = new Size(182, 643);
             TextInstructionListView.TabIndex = 3;
             TextInstructionListView.UseCompatibleStateImageBehavior = false;
             TextInstructionListView.View = View.SmallIcon;
@@ -607,11 +608,11 @@
             tableLayoutPanel4.Controls.Add(AddTextInstructionBtn, 0, 0);
             tableLayoutPanel4.Controls.Add(DeleteTextInstructionBtn, 1, 0);
             tableLayoutPanel4.Dock = DockStyle.Bottom;
-            tableLayoutPanel4.Location = new Point(0, 558);
+            tableLayoutPanel4.Location = new Point(0, 643);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
             tableLayoutPanel4.RowCount = 1;
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Absolute, 18F));
-            tableLayoutPanel4.Size = new Size(170, 39);
+            tableLayoutPanel4.Size = new Size(182, 39);
             tableLayoutPanel4.TabIndex = 2;
             // 
             // AddTextInstructionBtn
@@ -628,7 +629,7 @@
             // 
             DeleteTextInstructionBtn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             DeleteTextInstructionBtn.Enabled = false;
-            DeleteTextInstructionBtn.Location = new Point(117, 3);
+            DeleteTextInstructionBtn.Location = new Point(129, 3);
             DeleteTextInstructionBtn.Name = "DeleteTextInstructionBtn";
             DeleteTextInstructionBtn.Size = new Size(50, 22);
             DeleteTextInstructionBtn.TabIndex = 10;
@@ -642,7 +643,7 @@
             FontTab.Location = new Point(4, 24);
             FontTab.Name = "FontTab";
             FontTab.Padding = new Padding(3);
-            FontTab.Size = new Size(946, 600);
+            FontTab.Size = new Size(984, 685);
             FontTab.TabIndex = 1;
             FontTab.Text = "Fonts";
             FontTab.UseVisualStyleBackColor = true;
@@ -653,7 +654,7 @@
             groupBox1.Dock = DockStyle.Fill;
             groupBox1.Location = new Point(3, 3);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(940, 594);
+            groupBox1.Size = new Size(978, 679);
             groupBox1.TabIndex = 5;
             groupBox1.TabStop = false;
             groupBox1.Text = "Fonts";
@@ -674,7 +675,7 @@
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel5.Size = new Size(934, 572);
+            tableLayoutPanel5.Size = new Size(972, 657);
             tableLayoutPanel5.TabIndex = 0;
             // 
             // FontsListView
@@ -685,7 +686,7 @@
             FontsListView.GridLines = true;
             FontsListView.Location = new Point(3, 3);
             FontsListView.Name = "FontsListView";
-            FontsListView.Size = new Size(461, 536);
+            FontsListView.Size = new Size(480, 621);
             FontsListView.TabIndex = 0;
             FontsListView.UseCompatibleStateImageBehavior = false;
             FontsListView.View = View.Details;
@@ -718,12 +719,12 @@
             tableLayoutPanel8.Controls.Add(EditFontButton, 1, 0);
             tableLayoutPanel8.Controls.Add(SelectFontStyleButton, 4, 0);
             tableLayoutPanel8.Dock = DockStyle.Fill;
-            tableLayoutPanel8.Location = new Point(0, 542);
+            tableLayoutPanel8.Location = new Point(0, 627);
             tableLayoutPanel8.Margin = new Padding(0);
             tableLayoutPanel8.Name = "tableLayoutPanel8";
             tableLayoutPanel8.RowCount = 1;
             tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel8.Size = new Size(467, 30);
+            tableLayoutPanel8.Size = new Size(486, 30);
             tableLayoutPanel8.TabIndex = 1;
             // 
             // AddFontButton
@@ -759,7 +760,7 @@
             // SelectFontStyleButton
             // 
             SelectFontStyleButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SelectFontStyleButton.Location = new Point(355, 3);
+            SelectFontStyleButton.Location = new Point(374, 3);
             SelectFontStyleButton.Name = "SelectFontStyleButton";
             SelectFontStyleButton.Size = new Size(109, 24);
             SelectFontStyleButton.TabIndex = 5;
@@ -771,11 +772,36 @@
             // 
             panel9.Controls.Add(groupBox5);
             panel9.Dock = DockStyle.Fill;
-            panel9.Location = new Point(467, 0);
+            panel9.Location = new Point(486, 0);
             panel9.Margin = new Padding(0);
             panel9.Name = "panel9";
-            panel9.Size = new Size(467, 542);
+            panel9.Size = new Size(486, 627);
             panel9.TabIndex = 2;
+            // 
+            // groupBox5
+            // 
+            groupBox5.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox5.Controls.Add(FontKeyProjectFnRB);
+            groupBox5.Controls.Add(FontKeyBothRB);
+            groupBox5.Controls.Add(FontKeyFontnameRB);
+            groupBox5.Location = new Point(3, 4);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(480, 121);
+            groupBox5.TabIndex = 3;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "Font Filekey format";
+            // 
+            // FontKeyProjectFnRB
+            // 
+            FontKeyProjectFnRB.AutoSize = true;
+            FontKeyProjectFnRB.Location = new Point(15, 30);
+            FontKeyProjectFnRB.Name = "FontKeyProjectFnRB";
+            FontKeyProjectFnRB.Size = new Size(161, 19);
+            FontKeyProjectFnRB.TabIndex = 0;
+            FontKeyProjectFnRB.TabStop = true;
+            FontKeyProjectFnRB.Text = "Include Project Fontname";
+            FontKeyProjectFnRB.UseVisualStyleBackColor = true;
+            FontKeyProjectFnRB.CheckedChanged += FontKeyProjectFnRB_CheckedChanged;
             // 
             // FontKeyBothRB
             // 
@@ -801,18 +827,6 @@
             FontKeyFontnameRB.UseVisualStyleBackColor = true;
             FontKeyFontnameRB.CheckedChanged += FontKeyFontnameRB_CheckedChanged;
             // 
-            // FontKeyProjectFnRB
-            // 
-            FontKeyProjectFnRB.AutoSize = true;
-            FontKeyProjectFnRB.Location = new Point(15, 30);
-            FontKeyProjectFnRB.Name = "FontKeyProjectFnRB";
-            FontKeyProjectFnRB.Size = new Size(161, 19);
-            FontKeyProjectFnRB.TabIndex = 0;
-            FontKeyProjectFnRB.TabStop = true;
-            FontKeyProjectFnRB.Text = "Include Project Fontname";
-            FontKeyProjectFnRB.UseVisualStyleBackColor = true;
-            FontKeyProjectFnRB.CheckedChanged += FontKeyProjectFnRB_CheckedChanged;
-            // 
             // ImageTab
             // 
             ImageTab.Controls.Add(tableLayoutPanel12);
@@ -820,7 +834,7 @@
             ImageTab.Margin = new Padding(0);
             ImageTab.Name = "ImageTab";
             ImageTab.Padding = new Padding(3);
-            ImageTab.Size = new Size(946, 600);
+            ImageTab.Size = new Size(984, 685);
             ImageTab.TabIndex = 2;
             ImageTab.Text = "Icons (SVG)";
             ImageTab.UseVisualStyleBackColor = true;
@@ -837,7 +851,7 @@
             tableLayoutPanel12.Name = "tableLayoutPanel12";
             tableLayoutPanel12.RowCount = 1;
             tableLayoutPanel12.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel12.Size = new Size(940, 594);
+            tableLayoutPanel12.Size = new Size(978, 679);
             tableLayoutPanel12.TabIndex = 14;
             // 
             // tableLayoutPanel11
@@ -847,7 +861,7 @@
             tableLayoutPanel11.Controls.Add(groupBox2, 0, 1);
             tableLayoutPanel11.Controls.Add(groupBox4, 0, 2);
             tableLayoutPanel11.Dock = DockStyle.Fill;
-            tableLayoutPanel11.Location = new Point(470, 0);
+            tableLayoutPanel11.Location = new Point(489, 0);
             tableLayoutPanel11.Margin = new Padding(0);
             tableLayoutPanel11.Name = "tableLayoutPanel11";
             tableLayoutPanel11.RowCount = 4;
@@ -855,7 +869,7 @@
             tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tableLayoutPanel11.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            tableLayoutPanel11.Size = new Size(470, 594);
+            tableLayoutPanel11.Size = new Size(489, 679);
             tableLayoutPanel11.TabIndex = 1;
             // 
             // groupBox2
@@ -864,7 +878,7 @@
             groupBox2.Dock = DockStyle.Fill;
             groupBox2.Location = new Point(3, 23);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(464, 266);
+            groupBox2.Size = new Size(483, 308);
             groupBox2.TabIndex = 0;
             groupBox2.TabStop = false;
             groupBox2.Text = "Preview";
@@ -882,7 +896,7 @@
             tableLayoutPanel15.RowCount = 2;
             tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
             tableLayoutPanel15.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel15.Size = new Size(458, 244);
+            tableLayoutPanel15.Size = new Size(477, 286);
             tableLayoutPanel15.TabIndex = 1;
             // 
             // svgViewer
@@ -890,7 +904,7 @@
             svgViewer.Dock = DockStyle.Fill;
             svgViewer.Location = new Point(3, 33);
             svgViewer.Name = "svgViewer";
-            svgViewer.Size = new Size(452, 208);
+            svgViewer.Size = new Size(471, 250);
             svgViewer.SizeMode = PictureBoxSizeMode.CenterImage;
             svgViewer.TabIndex = 0;
             svgViewer.TabStop = false;
@@ -908,7 +922,7 @@
             tableLayoutPanel16.Name = "tableLayoutPanel16";
             tableLayoutPanel16.RowCount = 1;
             tableLayoutPanel16.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel16.Size = new Size(458, 30);
+            tableLayoutPanel16.Size = new Size(477, 30);
             tableLayoutPanel16.TabIndex = 1;
             // 
             // label1
@@ -917,7 +931,7 @@
             label1.Dock = DockStyle.Fill;
             label1.Location = new Point(3, 0);
             label1.Name = "label1";
-            label1.Size = new Size(66, 30);
+            label1.Size = new Size(68, 30);
             label1.TabIndex = 0;
             label1.Text = "Select Style";
             label1.TextAlign = ContentAlignment.MiddleRight;
@@ -926,7 +940,7 @@
             // 
             IconStyleComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             IconStyleComboBox.FormattingEnabled = true;
-            IconStyleComboBox.Location = new Point(75, 3);
+            IconStyleComboBox.Location = new Point(77, 3);
             IconStyleComboBox.Name = "IconStyleComboBox";
             IconStyleComboBox.Size = new Size(121, 23);
             IconStyleComboBox.TabIndex = 1;
@@ -936,9 +950,9 @@
             // 
             groupBox4.Controls.Add(svgXMLViewer);
             groupBox4.Dock = DockStyle.Fill;
-            groupBox4.Location = new Point(3, 295);
+            groupBox4.Location = new Point(3, 337);
             groupBox4.Name = "groupBox4";
-            groupBox4.Size = new Size(464, 266);
+            groupBox4.Size = new Size(483, 308);
             groupBox4.TabIndex = 1;
             groupBox4.TabStop = false;
             groupBox4.Text = "Svg string";
@@ -948,7 +962,7 @@
             svgXMLViewer.Dock = DockStyle.Fill;
             svgXMLViewer.Location = new Point(3, 19);
             svgXMLViewer.Name = "svgXMLViewer";
-            svgXMLViewer.Size = new Size(458, 244);
+            svgXMLViewer.Size = new Size(477, 286);
             svgXMLViewer.TabIndex = 5;
             svgXMLViewer.Text = "";
             // 
@@ -965,7 +979,7 @@
             tableLayoutPanel13.RowCount = 2;
             tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel13.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            tableLayoutPanel13.Size = new Size(470, 594);
+            tableLayoutPanel13.Size = new Size(489, 679);
             tableLayoutPanel13.TabIndex = 0;
             // 
             // panel8
@@ -975,10 +989,10 @@
             panel8.Controls.Add(DeleteImagesButton);
             panel8.Controls.Add(AddIconButton);
             panel8.Dock = DockStyle.Fill;
-            panel8.Location = new Point(0, 564);
+            panel8.Location = new Point(0, 649);
             panel8.Margin = new Padding(0);
             panel8.Name = "panel8";
-            panel8.Size = new Size(470, 30);
+            panel8.Size = new Size(489, 30);
             panel8.TabIndex = 9;
             // 
             // EditIconNameButton
@@ -1033,7 +1047,7 @@
             tableLayoutPanel14.RowCount = 2;
             tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel14.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel14.Size = new Size(470, 564);
+            tableLayoutPanel14.Size = new Size(489, 649);
             tableLayoutPanel14.TabIndex = 10;
             // 
             // IconListView
@@ -1044,7 +1058,7 @@
             IconListView.GridLines = true;
             IconListView.Location = new Point(3, 23);
             IconListView.Name = "IconListView";
-            IconListView.Size = new Size(464, 538);
+            IconListView.Size = new Size(483, 623);
             IconListView.TabIndex = 8;
             IconListView.UseCompatibleStateImageBehavior = false;
             IconListView.View = View.Details;
@@ -1063,22 +1077,13 @@
             // 
             columnHeader2.Text = "Styles";
             // 
-            // splitter2
-            // 
-            splitter2.Dock = DockStyle.Right;
-            splitter2.Location = new Point(957, 0);
-            splitter2.Name = "splitter2";
-            splitter2.Size = new Size(3, 628);
-            splitter2.TabIndex = 3;
-            splitter2.TabStop = false;
-            // 
             // panel3
             // 
             panel3.Controls.Add(tableLayoutPanel6);
             panel3.Dock = DockStyle.Right;
-            panel3.Location = new Point(960, 0);
+            panel3.Location = new Point(992, 0);
             panel3.Name = "panel3";
-            panel3.Size = new Size(300, 628);
+            panel3.Size = new Size(336, 713);
             panel3.TabIndex = 2;
             // 
             // tableLayoutPanel6
@@ -1093,7 +1098,7 @@
             tableLayoutPanel6.RowCount = 2;
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 80F));
             tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 20F));
-            tableLayoutPanel6.Size = new Size(300, 628);
+            tableLayoutPanel6.Size = new Size(336, 713);
             tableLayoutPanel6.TabIndex = 5;
             // 
             // panelWithBorder3
@@ -1103,7 +1108,7 @@
             panelWithBorder3.Location = new Point(0, 0);
             panelWithBorder3.Margin = new Padding(0);
             panelWithBorder3.Name = "panelWithBorder3";
-            panelWithBorder3.Size = new Size(300, 502);
+            panelWithBorder3.Size = new Size(336, 570);
             panelWithBorder3.TabIndex = 0;
             // 
             // tableLayoutPanel7
@@ -1118,12 +1123,12 @@
             tableLayoutPanel7.Location = new Point(0, 0);
             tableLayoutPanel7.Name = "tableLayoutPanel7";
             tableLayoutPanel7.RowCount = 5;
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 230F));
             tableLayoutPanel7.RowStyles.Add(new RowStyle());
             tableLayoutPanel7.RowStyles.Add(new RowStyle());
             tableLayoutPanel7.RowStyles.Add(new RowStyle());
-            tableLayoutPanel7.RowStyles.Add(new RowStyle());
-            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel7.Size = new Size(300, 502);
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            tableLayoutPanel7.Size = new Size(336, 570);
             tableLayoutPanel7.TabIndex = 0;
             // 
             // PixelDataGroupBox
@@ -1134,9 +1139,9 @@
             PixelDataGroupBox.Controls.Add(RGB565RadioButton);
             PixelDataGroupBox.Dock = DockStyle.Fill;
             PixelDataGroupBox.ForeColor = SystemColors.ControlText;
-            PixelDataGroupBox.Location = new Point(3, 195);
+            PixelDataGroupBox.Location = new Point(3, 289);
             PixelDataGroupBox.Name = "PixelDataGroupBox";
-            PixelDataGroupBox.Size = new Size(294, 77);
+            PixelDataGroupBox.Size = new Size(330, 77);
             PixelDataGroupBox.TabIndex = 11;
             PixelDataGroupBox.TabStop = false;
             PixelDataGroupBox.Text = "Pixel Data ";
@@ -1190,9 +1195,9 @@
             // 
             FontFormatGroupBox.Controls.Add(IncludeCharInfoInImageCheckBox);
             FontFormatGroupBox.Dock = DockStyle.Fill;
-            FontFormatGroupBox.Location = new Point(3, 139);
+            FontFormatGroupBox.Location = new Point(3, 233);
             FontFormatGroupBox.Name = "FontFormatGroupBox";
-            FontFormatGroupBox.Size = new Size(294, 50);
+            FontFormatGroupBox.Size = new Size(330, 50);
             FontFormatGroupBox.TabIndex = 10;
             FontFormatGroupBox.TabStop = false;
             FontFormatGroupBox.Text = "Font Format";
@@ -1210,6 +1215,10 @@
             // 
             // FileFormatGroupBox
             // 
+            FileFormatGroupBox.Controls.Add(CompressBasicImagePixeldataCheckBox);
+            FileFormatGroupBox.Controls.Add(CompressOptimizedPixelDataCheckBox);
+            FileFormatGroupBox.Controls.Add(CreatePixelDataFileCheckBox);
+            FileFormatGroupBox.Controls.Add(OptimizedImageRadioButton);
             FileFormatGroupBox.Controls.Add(IncludeFileInfoInImageCheckbox);
             FileFormatGroupBox.Controls.Add(SingleFileRadioButton);
             FileFormatGroupBox.Controls.Add(IncludeWidthAndHeightCheckbox);
@@ -1217,15 +1226,60 @@
             FileFormatGroupBox.Dock = DockStyle.Fill;
             FileFormatGroupBox.Location = new Point(3, 3);
             FileFormatGroupBox.Name = "FileFormatGroupBox";
-            FileFormatGroupBox.Size = new Size(294, 130);
+            FileFormatGroupBox.Size = new Size(330, 224);
             FileFormatGroupBox.TabIndex = 8;
             FileFormatGroupBox.TabStop = false;
             FileFormatGroupBox.Text = "File Format";
             // 
+            // CompressBasicImagePixeldataCheckBox
+            // 
+            CompressBasicImagePixeldataCheckBox.AutoSize = true;
+            CompressBasicImagePixeldataCheckBox.Location = new Point(33, 59);
+            CompressBasicImagePixeldataCheckBox.Name = "CompressBasicImagePixeldataCheckBox";
+            CompressBasicImagePixeldataCheckBox.Size = new Size(129, 19);
+            CompressBasicImagePixeldataCheckBox.TabIndex = 14;
+            CompressBasicImagePixeldataCheckBox.Text = "Compress Pixeldata";
+            CompressBasicImagePixeldataCheckBox.UseVisualStyleBackColor = true;
+            CompressBasicImagePixeldataCheckBox.CheckedChanged += CompressBasicImagePixeldataCheckBox_CheckedChanged;
+            // 
+            // CompressOptimizedPixelDataCheckBox
+            // 
+            CompressOptimizedPixelDataCheckBox.AutoSize = true;
+            CompressOptimizedPixelDataCheckBox.Location = new Point(33, 127);
+            CompressOptimizedPixelDataCheckBox.Name = "CompressOptimizedPixelDataCheckBox";
+            CompressOptimizedPixelDataCheckBox.Size = new Size(129, 19);
+            CompressOptimizedPixelDataCheckBox.TabIndex = 13;
+            CompressOptimizedPixelDataCheckBox.Text = "Compress Pixeldata";
+            CompressOptimizedPixelDataCheckBox.UseVisualStyleBackColor = true;
+            CompressOptimizedPixelDataCheckBox.CheckedChanged += CompressOptimizedPixelDataCheckBox_CheckedChanged;
+            // 
+            // CreatePixelDataFileCheckBox
+            // 
+            CreatePixelDataFileCheckBox.AutoSize = true;
+            CreatePixelDataFileCheckBox.Location = new Point(33, 108);
+            CreatePixelDataFileCheckBox.Name = "CreatePixelDataFileCheckBox";
+            CreatePixelDataFileCheckBox.Size = new Size(129, 19);
+            CreatePixelDataFileCheckBox.TabIndex = 11;
+            CreatePixelDataFileCheckBox.Text = "Create Pixeldata file";
+            CreatePixelDataFileCheckBox.UseVisualStyleBackColor = true;
+            CreatePixelDataFileCheckBox.CheckedChanged += CreatePixelDataFileCheckBox_CheckedChanged;
+            // 
+            // OptimizedImageRadioButton
+            // 
+            OptimizedImageRadioButton.AutoSize = true;
+            OptimizedImageRadioButton.Location = new Point(11, 88);
+            OptimizedImageRadioButton.Name = "OptimizedImageRadioButton";
+            OptimizedImageRadioButton.Size = new Size(116, 19);
+            OptimizedImageRadioButton.TabIndex = 10;
+            OptimizedImageRadioButton.TabStop = true;
+            OptimizedImageRadioButton.Text = "Optimized Image";
+            OptimizedImageRadioButton.UseVisualStyleBackColor = true;
+            OptimizedImageRadioButton.CheckedChanged += OptimizedImageRadioButton_CheckedChanged;
+            // 
             // IncludeFileInfoInImageCheckbox
             // 
             IncludeFileInfoInImageCheckbox.AutoSize = true;
-            IncludeFileInfoInImageCheckbox.Location = new Point(33, 47);
+            IncludeFileInfoInImageCheckbox.Location = new Point(33, 40);
             IncludeFileInfoInImageCheckbox.Name = "IncludeFileInfoInImageCheckbox";
             IncludeFileInfoInImageCheckbox.Size = new Size(195, 19);
             IncludeFileInfoInImageCheckbox.TabIndex = 9;
@@ -1237,7 +1291,7 @@
             // 
             SingleFileRadioButton.AutoSize = true;
             SingleFileRadioButton.Checked = true;
-            SingleFileRadioButton.Location = new Point(11, 77);
+            SingleFileRadioButton.Location = new Point(11, 154);
             SingleFileRadioButton.Name = "SingleFileRadioButton";
             SingleFileRadioButton.Size = new Size(78, 19);
             SingleFileRadioButton.TabIndex = 6;
@@ -1249,7 +1303,7 @@
             // IncludeWidthAndHeightCheckbox
             // 
             IncludeWidthAndHeightCheckbox.AutoSize = true;
-            IncludeWidthAndHeightCheckbox.Location = new Point(33, 102);
+            IncludeWidthAndHeightCheckbox.Location = new Point(33, 175);
             IncludeWidthAndHeightCheckbox.Name = "IncludeWidthAndHeightCheckbox";
             IncludeWidthAndHeightCheckbox.Size = new Size(162, 19);
             IncludeWidthAndHeightCheckbox.TabIndex = 8;
@@ -1285,9 +1339,9 @@
             groupBox3.Controls.Add(pixelDataTextBox);
             groupBox3.Controls.Add(label14);
             groupBox3.Dock = DockStyle.Fill;
-            groupBox3.Location = new Point(3, 278);
+            groupBox3.Location = new Point(3, 372);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(294, 200);
+            groupBox3.Size = new Size(330, 200);
             groupBox3.TabIndex = 12;
             groupBox3.TabStop = false;
             groupBox3.Text = "Pixel File";
@@ -1419,18 +1473,18 @@
             groupBox7.Controls.Add(CreateBitmapsButton);
             groupBox7.Controls.Add(CreateImageButton);
             groupBox7.Dock = DockStyle.Fill;
-            groupBox7.Location = new Point(3, 505);
+            groupBox7.Location = new Point(3, 573);
             groupBox7.Name = "groupBox7";
-            groupBox7.Size = new Size(294, 120);
+            groupBox7.Size = new Size(330, 137);
             groupBox7.TabIndex = 13;
             groupBox7.TabStop = false;
             groupBox7.Text = "Build";
             // 
             // BuildAllButton
             // 
-            BuildAllButton.Location = new Point(6, 80);
+            BuildAllButton.Location = new Point(222, 22);
             BuildAllButton.Name = "BuildAllButton";
-            BuildAllButton.Size = new Size(118, 23);
+            BuildAllButton.Size = new Size(102, 23);
             BuildAllButton.TabIndex = 5;
             BuildAllButton.Text = "Build All";
             BuildAllButton.UseVisualStyleBackColor = true;
@@ -1440,7 +1494,7 @@
             // 
             CreateBitmapsButton.Location = new Point(6, 22);
             CreateBitmapsButton.Name = "CreateBitmapsButton";
-            CreateBitmapsButton.Size = new Size(118, 23);
+            CreateBitmapsButton.Size = new Size(102, 23);
             CreateBitmapsButton.TabIndex = 3;
             CreateBitmapsButton.Text = "Create Bitmaps";
             CreateBitmapsButton.UseVisualStyleBackColor = true;
@@ -1448,21 +1502,13 @@
             // 
             // CreateImageButton
             // 
-            CreateImageButton.Location = new Point(6, 51);
+            CreateImageButton.Location = new Point(114, 22);
             CreateImageButton.Name = "CreateImageButton";
-            CreateImageButton.Size = new Size(118, 23);
+            CreateImageButton.Size = new Size(102, 23);
             CreateImageButton.TabIndex = 4;
             CreateImageButton.Text = "Create Image";
             CreateImageButton.UseVisualStyleBackColor = true;
             CreateImageButton.Click += CreateImageButton_Click;
-            // 
-            // splitter1
-            // 
-            splitter1.Location = new Point(0, 0);
-            splitter1.Name = "splitter1";
-            splitter1.Size = new Size(3, 628);
-            splitter1.TabIndex = 1;
-            splitter1.TabStop = false;
             // 
             // panel6
             // 
@@ -1471,27 +1517,14 @@
             panel6.Location = new Point(0, 0);
             panel6.Margin = new Padding(0);
             panel6.Name = "panel6";
-            panel6.Size = new Size(1266, 20);
+            panel6.Size = new Size(1334, 20);
             panel6.TabIndex = 1;
-            // 
-            // groupBox5
-            // 
-            groupBox5.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            groupBox5.Controls.Add(FontKeyProjectFnRB);
-            groupBox5.Controls.Add(FontKeyBothRB);
-            groupBox5.Controls.Add(FontKeyFontnameRB);
-            groupBox5.Location = new Point(3, 4);
-            groupBox5.Name = "groupBox5";
-            groupBox5.Size = new Size(461, 121);
-            groupBox5.TabIndex = 3;
-            groupBox5.TabStop = false;
-            groupBox5.Text = "Font Filekey format";
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1266, 720);
+            ClientSize = new Size(1334, 805);
             Controls.Add(MainTableLayoutPanel);
             Controls.Add(statusStrip);
             Controls.Add(menuStrip1);
@@ -1523,6 +1556,8 @@
             tableLayoutPanel5.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
             panel9.ResumeLayout(false);
+            groupBox5.ResumeLayout(false);
+            groupBox5.PerformLayout();
             ImageTab.ResumeLayout(false);
             tableLayoutPanel12.ResumeLayout(false);
             tableLayoutPanel11.ResumeLayout(false);
@@ -1552,8 +1587,6 @@
             ((System.ComponentModel.ISupportInitialize)VersionMinorInput).EndInit();
             ((System.ComponentModel.ISupportInitialize)VersionMajorInput).EndInit();
             groupBox7.ResumeLayout(false);
-            groupBox5.ResumeLayout(false);
-            groupBox5.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1567,8 +1600,6 @@
         private ToolStripMenuItem NewToolStripMenuItem;
         private ToolStripMenuItem OpenToolStripMenuItem;
         private Panel panel1;
-        private Splitter splitter2;
-        private Splitter splitter1;
         private Panel panel4;
         private FontDialog FontDialog;
         private ToolStripMenuItem SaveToolStripMenuItem;
@@ -1690,5 +1721,10 @@
         private RadioButton FontKeyFontnameRB;
         private RadioButton FontKeyProjectFnRB;
         private GroupBox groupBox5;
+        private RadioButton OptimizedImageRadioButton;
+        private CheckBox CreatePixelDataFileCheckBox;
+        private CheckBox CompressOptimizedPixelDataCheckBox;
+        private ToolTip toolTipMainForm;
+        private CheckBox CompressBasicImagePixeldataCheckBox;
     }
 }

@@ -24,7 +24,8 @@ namespace IRL_Image_Creator.Windows.FontStyleForms
             BackColorTB.Color = m_FontBitmapStyle.BackColor;
             m_SelectedTextColorID = m_FontBitmapStyle.TextConverterColorId;
             m_SelectedBackColorID = m_FontBitmapStyle.BackConverterColorId;
-            MonospaceNumbersCheckBox.Checked = m_FontBitmapStyle.MonospaceNumbers;
+            DigitsOnlyCheckBox.Checked = m_FontBitmapStyle.DigitsOnly;
+            MonospaceDigitsCheckBox.Checked = m_FontBitmapStyle.MonospaceNumbers;
             LeftMarginTB.Text = m_FontBitmapStyle.Margin.Left.ToString();
             TopMarginTB.Text = m_FontBitmapStyle.Margin.Top.ToString();
             RightMarginTB.Text = m_FontBitmapStyle.Margin.Right.ToString();
@@ -54,7 +55,8 @@ namespace IRL_Image_Creator.Windows.FontStyleForms
             m_FontBitmapStyle.BackColor = BackColorTB.Color;
             m_FontBitmapStyle.TextConverterColorId = m_SelectedTextColorID;
             m_FontBitmapStyle.BackConverterColorId = m_SelectedBackColorID;
-            m_FontBitmapStyle.MonospaceNumbers = MonospaceNumbersCheckBox.Checked;
+            m_FontBitmapStyle.DigitsOnly = DigitsOnlyCheckBox.Checked;
+            m_FontBitmapStyle.MonospaceNumbers = MonospaceDigitsCheckBox.Checked;
             m_FontBitmapStyle.Margin.Left = int.Parse(LeftMarginTB.Text);
             m_FontBitmapStyle.Margin.Top = int.Parse(TopMarginTB.Text);
             m_FontBitmapStyle.Margin.Right = int.Parse(RightMarginTB.Text);

@@ -32,13 +32,20 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                 sw.WriteLine("extern bool fs_readData(const int32_t offset, uint8_t *p_out_data, const int32_t size);");
             }
             sw.WriteLine("");
-            sw.WriteLine("bool fs_getFileInfo(const file_key_e file_key, fs_file_info_s *p_out_file_info)");
+            sw.WriteLine("bool fs_getFileInfo(const file_key_e file_key, fs_file_info_s *p_out_file_info, uint8_t *p_dataLocation)");
             sw.WriteLine("{");
+            sw.WriteLine("    if ((int32_t)file_key <= 0)");
+            sw.WriteLine("    {");
+            sw.WriteLine("        return false;");
+            sw.WriteLine("    }");
+            sw.WriteLine("");
+            sw.WriteLine("    *p_dataLocation = (fileIndex < FS_FILES_START_PIXEL_DATA_INDEX) ? FS_FILE_LOCATION_CODE : FS_FILE_LOCATION_PIXEL_DATA;");
+            sw.WriteLine("");
 
             if (builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
             {
                 sw.WriteLine("    bool fileFound = false;");
-                sw.WriteLine("    const uint32_t fileIndex = (int32_t)file_key;");
+                sw.WriteLine("    const uint32_t fileIndex = (uint32_t)((int32_t)file_key - 1);");
                 sw.WriteLine("");
                 sw.WriteLine("    if (FS_FILES > fileIndex)");
                 sw.WriteLine("    {");
@@ -51,7 +58,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             else
             {
                 sw.WriteLine("    bool fileFound = false;");
-                sw.WriteLine("    const uint32_t fileIndex = (int32_t)file_key;");
+                sw.WriteLine("    const uint32_t fileIndex = (uint32_t)((int32_t)file_key - 1);");
                 sw.WriteLine("    const uint32_t offset = fileIndex * FS_FILE_INFO_SIZE;");
                 sw.WriteLine("");
                 sw.WriteLine("    if ((FS_FILES > fileIndex) && (fileIndex > 0))");

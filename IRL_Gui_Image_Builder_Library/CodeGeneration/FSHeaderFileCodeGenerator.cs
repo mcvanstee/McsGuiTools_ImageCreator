@@ -22,8 +22,17 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.DefineIfNotDefined(sw, "FS_PIXEL_DATA_CRC", fsbBuilder.CRC.ToString() + "u");
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.Define(sw, "FS_FILES", fsbBuilder.FsbFileInfos.Count.ToString());
             CodeGenegrationUtils.Define(sw, "FS_BYTES_PER_PIXEL", bytesPerPixel.ToString());
+            CodeGenegrationUtils.Define(sw, "FS_FILES", fsbBuilder.FsbFileInfos.Count.ToString());
+            if (builderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage)
+            {
+                CodeGenegrationUtils.Define(sw, "FS_FILES_OPTIMIZED", fsbBuilder.NoOfOptimizedFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILES_PIXEL_DATA", fsbBuilder.NoOfPixelDataFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILES_START_PIXEL_DATA_INDEX", fsbBuilder.NoOfOptimizedFiles.ToString());
+                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_CODE", "0");
+                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_PIXEL_DATA", "1");                
+            }
+           
             CodeGenegrationUtils.BlankLine(sw);
             sw.WriteLine("typedef struct");
             sw.WriteLine("{");
@@ -36,15 +45,15 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 
             sw.WriteLine("typedef enum");
             sw.WriteLine("{");
+            sw.WriteLine("    FILE_KEY_NONE = 0,");
 
             foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FsbFileInfos)
             {
                 string key = "FILE_KEY_";
 
-                sw.WriteLine("    " + key + fsbFileInfo.FileKey + " = " + fsbFileInfo.FileIndex.ToString() + ",");
+                sw.WriteLine("    " + key + fsbFileInfo.FileKey + " = " + (fsbFileInfo.FileIndex + 1).ToString() + ",");
             }
 
-            sw.WriteLine("    FILE_KEY_NONE = 0xFFFFFFFF");
             sw.WriteLine("} file_key_e;");
             sw.WriteLine("");
             sw.WriteLine("/**");
@@ -55,7 +64,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("*         where the file info data is copied to.");
             sw.WriteLine("* @retval file_search_result_e");
             sw.WriteLine("*/");
-            sw.WriteLine("bool fs_getFileInfo(const file_key_e file_key, fs_file_info_s *p_out_file_info);");
+            sw.WriteLine("bool fs_getFileInfo(const file_key_e file_key, fs_file_info_s *p_out_file_info, uint8_t *p_dataLocation);");
             sw.WriteLine("");
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);

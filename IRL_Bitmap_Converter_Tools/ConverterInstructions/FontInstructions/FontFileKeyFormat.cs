@@ -4,6 +4,6 @@
     {
         Both,
         FontName,
-        ProjectFontName
+        ProjectFontName,
     }
 }

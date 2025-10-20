@@ -3,6 +3,8 @@ using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
 using IRL_Gui_Image_Builder_Library.Projects;
 using System.Drawing;
 using IRL_Common_Library.Consts;
+using IRL_Gui_Image_Builder_Library.Exceptions;
+using System.Diagnostics;
 
 namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSystemBasic
 {
@@ -12,6 +14,8 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
         private readonly ImageBuilderSettings m_builderSettings;
         private readonly BuilderStatusUpdater m_statusUpdater;
         private readonly List<FsbFileInfo> m_files = new List<FsbFileInfo>();
+        public int NoOfOptimizedFiles { get; private set; } = 0;
+        public int NoOfPixelDataFiles { get; private set; } = 0;
 
         public readonly int SizeOfFileInfo;
         public uint CRC { get; set; }
@@ -62,11 +66,12 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
             }
         }
 
-        public bool BuildFileSystem()
+        public bool BuildBasicFileSystem()
         {
             DirectoryInfo directoryInfoRoot = new(BuildFolders.BmpImputFolderPath(m_projectPath));
             AddAllFiles(directoryInfoRoot);
             CreateFileKeyNames();
+            CheckBasicFileSystemDataCompression();
 
             bool sortFilePropertiesOK = FsbFilePropertyBuilder.SortAllFilePropertys(m_builderSettings, FsbFileInfos, m_statusUpdater);
             if (!sortFilePropertiesOK)
@@ -107,6 +112,71 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
             return true;
         }
 
+        public bool BuildOptimizedFileSystem()
+        {
+            DirectoryInfo directoryInfoRoot = new(BuildFolders.BmpImputFolderPath(m_projectPath));
+            AddAllFiles(directoryInfoRoot);
+            CreateFileKeyNames();
+            CheckOptimizedFileSystemDataCompression();
+
+            bool sortFilePropertiesOK = FsbFilePropertyBuilder.SortAllFilePropertys(m_builderSettings, FsbFileInfos, m_statusUpdater);
+            if (!sortFilePropertiesOK)
+            {
+                return false;
+            }
+
+            bool hasDuplicateFilenames = HasDuplicateFilenames();
+
+            if (m_files.Count == 0 || hasDuplicateFilenames)
+            {
+                return false;
+            }
+
+            SortOptimizedFiles();
+
+            FsbFilePropertyBuilder.AddAllFileProperties(m_builderSettings, m_files, m_statusUpdater);
+
+            bool filePropertiesOK = CheckFileProperties();
+            if (!filePropertiesOK)
+            {
+                return false;
+            }
+
+            WriteFileNamesToDebugFile();
+
+            bool hasDuplicateFileKeys = HasDuplicateFileKeys();
+            if (hasDuplicateFileKeys)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < m_files.Count; i++)
+            {
+                m_files[i].FileIndex = i;
+            }
+
+            return true;
+        }
+
+        private void SortOptimizedFiles()
+        {
+            Dictionary<bool, List<FsbFileInfo>> compressionSorted = 
+                m_files.GroupBy(item => item.DataCompression != FsbDataCompression.SourcePixelDataFileOptimized)
+                     .ToDictionary(x => x.Key, x => x.ToList());
+
+            List<FsbFileInfo>? pixelDataFiles = compressionSorted.GetValueOrDefault(true);
+            List<FsbFileInfo>? optimizedPixelDataFiles = compressionSorted.GetValueOrDefault(false);
+            NoOfOptimizedFiles = optimizedPixelDataFiles?.Count ?? 0;
+            NoOfPixelDataFiles = pixelDataFiles?.Count ?? 0;
+
+            m_files.Clear();
+            pixelDataFiles?.Sort((x, y) => x.FileKey.CompareTo(y.FileKey));
+            optimizedPixelDataFiles?.Sort((x, y) => x.FileKey.CompareTo(y.FileKey));
+
+            m_files.AddRange(optimizedPixelDataFiles ?? new List<FsbFileInfo>());
+            m_files.AddRange(pixelDataFiles ?? new List<FsbFileInfo>());
+        }
+
         private void AddAllFiles(DirectoryInfo directoryInfo)
         {
             m_statusUpdater.UpdateStatus("Add all Bitmap files");
@@ -120,7 +190,55 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
             }
         }
 
-        public void ConvertAllFilesPixelData(ref byte[] pixelData, int pixelDataOffset, ref byte[] externalDisplayPixelData)
+        public void AddPixelData(ref byte[] pixelData, int offset)
+        {
+            foreach (FsbFileInfo fsbFileInfo in m_files)
+            {
+                ushort properties = 0;
+
+                foreach (FsbFileProperty fsbFileProperty in fsbFileInfo.FsbFileProperties)
+                {
+                    properties |= (ushort)(1u << fsbFileProperty.Index);
+                }
+
+                if (fsbFileInfo.IsDummy)
+                {
+                    fsbFileInfo.FsbFile.UpdateValues(0xFFFFFFFF, properties, 0, 0);
+                }
+                else if (fsbFileInfo.DataCompression == FsbDataCompression.None)
+                {
+                    m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
+
+                    using Bitmap bitmap = new(fsbFileInfo.FilePath, true);
+                    int writeIndex = pixelData.Length;
+
+                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData(bitmap, m_builderSettings.PixelDataFormat);
+                    ArrayUtils.AppendToArray(ref pixelData, convertedPixelData);
+
+                    fsbFileInfo.FsbFile.UpdateValues(
+                        (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
+                }
+                else if (fsbFileInfo.DataCompression == FsbDataCompression.PixelDataFileOptimized)
+                {
+                    m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
+
+                    using Bitmap bitmap = new(fsbFileInfo.FilePath, true);
+                    int writeIndex = pixelData.Length;
+                    uint compressedPixels = 0;
+
+                    byte[] convertedPixelData = PixelDataConverter.GetCompressedPixelData(bitmap, m_builderSettings.PixelDataFormat, ref compressedPixels);
+                    ArrayUtils.AppendToArray(ref pixelData, convertedPixelData);
+
+                    fsbFileInfo.FsbFile.UpdateValues(
+                        (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height, compressedPixels);
+                }
+                else
+                {
+                }
+            }
+        }
+
+        public void AddOptimizedPixelData(ref byte[] pixelData, int offset)
         {
             foreach (FsbFileInfo fsbFileInfo in m_files)
             {
@@ -139,36 +257,42 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
                     file.Width = 0;
                     file.Height = 0;
                 }
-                else
+                else if (fsbFileInfo.DataCompression == FsbDataCompression.SourcePixelDataFileOptimized)
                 {
                     m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
 
                     using Bitmap bitmap = new(fsbFileInfo.FilePath, true);
-
                     int writeIndex = pixelData.Length;
 
-                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData_1(bitmap, m_builderSettings.PixelDataFormat);
+                    byte[] convertedPixelData = PixelDataConverter.GetOptimizedPixelData(bitmap);
+                    uint compressedPixels = (uint)(convertedPixelData.Length / 2);
                     ArrayUtils.AppendToArray(ref pixelData, convertedPixelData);
 
-                    AddExternalDisplayPixelData(ref externalDisplayPixelData, bitmap);
-
-                    FsbFile file = fsbFileInfo.FsbFile;
-                    file.DataOffset = (uint)(writeIndex + pixelDataOffset);
-                    file.Properties = properties;
-                    file.Width = (ushort)bitmap.Width;
-                    file.Height = (ushort)bitmap.Height;
-
-                    bitmap.Dispose();
+                    fsbFileInfo.FsbFile.UpdateValues(
+                        (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height, compressedPixels);
+                }
+                else
+                {
                 }
             }
-        }
 
-        private static void AddExternalDisplayPixelData(ref byte[] externalDisplayPixelData, Bitmap bitmap)
-        {
-            PixelDataFormat externDixplayFormat = new();
-            externDixplayFormat.PixelFormat = PixelFormat.RGB;
-            byte[] bitmapPixelData = PixelDataConverter.GetConvertedPixelData_1(bitmap, externDixplayFormat);
-            ArrayUtils.AppendToArray(ref externalDisplayPixelData, bitmapPixelData);
+            //List<byte> colors = new List<byte>();
+            //for (int i = 0; i < pixelData.Length; i += 2)
+            //{
+            //    byte color = pixelData[i+1];
+            //    if (!colors.Contains(color))
+            //    {
+            //        colors.Add(color);
+            //    }
+            //}
+
+            //colors.Sort();
+
+            //foreach (byte color in colors)
+            //{
+            //    Debug.WriteLine("Color: " + color);
+            //}
+            //Debug.WriteLine("No of colors: " + colors.Count);
         }
 
         private void AddFilesToFileInfoList(DirectoryInfo directoryInfo)
@@ -190,8 +314,8 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
 
         private static void AddFolders(FsbFileInfo fsbFileInfo, FileInfo sourceFileInfo)
         {
-            string directoryName = sourceFileInfo.DirectoryName;
-            string bmpDirectory = directoryName.Remove(0, directoryName.LastIndexOf("\\bmps") + 5);  //"\\BMP"
+            string? directoryName = sourceFileInfo.DirectoryName;
+            string? bmpDirectory = directoryName?.Remove(0, directoryName.LastIndexOf("\\bmps") + 5);  //"\\BMP"
 
             if (string.IsNullOrEmpty(bmpDirectory))
             {
@@ -249,6 +373,42 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSys
                 key = key.Replace(' ', '_');
 
                 fsbFileInfo.FileKey = key;
+            }
+        }
+
+        private void CheckBasicFileSystemDataCompression()
+        {
+            foreach (FsbFileInfo fileInfo in FsbFileInfos)
+            {
+                if (m_builderSettings.FileSystemFormat.CompressBasicImagePixelData)
+                {
+                    fileInfo.DataCompression = FsbDataCompression.PixelDataFileOptimized;
+                }
+                else
+                {
+                    fileInfo.DataCompression = FsbDataCompression.None;
+                }
+            }
+        }
+
+        private void CheckOptimizedFileSystemDataCompression()
+        {
+            foreach (FsbFileInfo fileInfo in FsbFileInfos)
+            {
+                if (fileInfo.FilePath.Contains(FileConstants.ConverterOutputFolder))
+                {
+                    fileInfo.DataCompression = FsbDataCompression.SourcePixelDataFileOptimized;
+                }
+                else if (m_builderSettings.FileSystemFormat.CompressOptimizedPixelData)
+                {
+                    fileInfo.DataCompression = FsbDataCompression.PixelDataFileOptimized;
+                    Debug.WriteLine("Compressing pixel data for file: " + fileInfo.Filename);
+                }
+                else
+                {
+                    fileInfo.DataCompression = FsbDataCompression.None;
+                    Debug.WriteLine("Not compressing pixel data for file: " + fileInfo.Filename);
+                }
             }
         }
 

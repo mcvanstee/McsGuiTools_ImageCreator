@@ -1,15 +1,16 @@
-﻿using System.Drawing;
-using IRL_Common_Library.Utils;
+﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions;
 using IRL_Bitmap_Converter_Tools.StatusUpdater;
-using IRL_Bitmap_Converter_Tools.ConverterInstructions;
+using IRL_Common_Library.Utils;
+using System.Drawing;
 
 namespace IRL_Bitmap_Converter_Tools.Converters
 {
     public static class FontToBitmapConverter
     {
         public static bool BuildFontBitmaps(
-            FontBitmap fontBitmap, List<FontBitmapStyle> fontBitmapStyles, List<ConverterFont> fonts, string outputPath, 
+            FontBitmap fontBitmap, List<FontBitmapStyle> fontBitmapStyles, bool bitmapMaskOnly, 
+            List<ConverterFont> fonts, string outputPath, 
             FontFileKeyFormat fontFileKeyFormat, ConverterStatusUpdater statusUpdater)
         {
             bool result = true;
@@ -30,7 +31,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
                 if (style != null)
                 {
-                    string fontName = GetFontName(font, fontBitmap, fontFileKeyFormat, style, converterFontName);
+                    string fontName = GetFontName(font, fontBitmap, fontFileKeyFormat, style, converterFontName, bitmapMaskOnly);
                     string path = $"{outputPath}\\{fontName}";
 
                     statusUpdater.UpdateStatusAndInstructionsConverted($"Font: {fontName}", 1);
@@ -44,21 +45,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                     else
                     {
                         Directory.CreateDirectory(path);
-
-                        int xLeft = 0;
-                        int xRight = 0;
-
-                        for (int i = 32; i <= 126; i++)
-                        {
-                            string charString = ((char)i).ToString();
-                            string filename = "C_" + i;
-
-                            GenerateCharacterBitmap(
-                                charString, font, style.MonospaceNumbers,
-                                style.Margin.Left, style.Margin.Top, style.Margin.Right, style.Margin.Bottom,
-                                style.TextColor, style.BackColor,
-                                path, filename, ref xLeft, ref xRight);
-                        }
+                        CreateASCIICharacterBitmaps(font, style, bitmapMaskOnly, path);
                     }
                 }
                 else
@@ -72,7 +59,44 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             return result;
         }
 
-        private static void GenerateCharacterBitmap(
+        static void CreateASCIICharacterBitmaps(Font font, FontBitmapStyle style, bool bitmapMaskOnly, string path)
+        {
+            Color textColor = style.TextColor;
+            Color backColor = style.BackColor;
+
+            if (bitmapMaskOnly)
+            {
+                textColor = Color.Black;
+                backColor = Color.White;
+            }
+
+            int xLeft = 0;
+            int xRight = 0;
+
+            for (int i = 32; i <= 126; i++)
+            {
+                if (style.DigitsOnly && !(IsDigit((char)i) || (char)i == '.' || (char)i == ','))
+                {
+                    continue;
+                }
+
+                string charString = ((char)i).ToString();
+                string filename = "C_" + i;
+
+                CreateCharacterBitmap(
+                    charString, font, style.MonospaceNumbers,
+                    style.Margin.Left, style.Margin.Top, style.Margin.Right, style.Margin.Bottom,
+                    textColor, backColor,
+                    path, filename, ref xLeft, ref xRight);
+            }
+        }
+
+        static bool IsDigit(char s)
+        {
+            return s >= '0' && s <= '9';
+        }
+
+        private static void CreateCharacterBitmap(
             string text, Font font, bool monoSpaceNumbers,
             int leftMargin, int topMargin, int rightMargin, int bottomMargin,
             Color textColor, Color backColor,
@@ -171,10 +195,18 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         }
 
         private static string GetFontName(
-            Font font, FontBitmap fontBitmap, FontFileKeyFormat fontFileKeyFormat, FontBitmapStyle style, string converterFontName)
+            Font font, FontBitmap fontBitmap, FontFileKeyFormat fontFileKeyFormat, 
+            FontBitmapStyle style, string converterFontName, bool bitmapMaskOnly)
         {
             int fontSize = (int)font.Size;
             string fontName;
+
+            if (bitmapMaskOnly)
+            {
+                fontName = $"{fontBitmap.FontName}_{fontSize}_{GetFontStyleString(fontBitmap.FontStyle)}";
+
+                return fontName;
+            }
 
             switch (fontFileKeyFormat)
             {
@@ -190,7 +222,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                     {
                         fontName = converterFontName;
                     }
-                        break;
+                    break;
                 case FontFileKeyFormat.Both:
                 default:
                     fontName = $"{fontBitmap.FontName}_{ fontSize}_{GetFontStyleString(fontBitmap.FontStyle)}";
@@ -200,7 +232,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
             string styleName = style.Name.Replace(" ", "_");
             fontName = fontName.Replace(" ", "_");
-            
+
             return $"{fontName}_{styleName}";
         }
     }

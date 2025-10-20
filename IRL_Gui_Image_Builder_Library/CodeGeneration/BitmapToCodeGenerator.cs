@@ -67,7 +67,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                 if (FileUtils.CanImportFile(extension))
                 {
                     using Bitmap bitmap = new(filePath, true);
-                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData_1(bitmap, builderSettings.PixelDataFormat);
+                    byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData(bitmap, builderSettings.PixelDataFormat);
 
                     string filename = ImageBuilder.GetFileName(filePath);
                     filename = filename.Replace(" ", "_");

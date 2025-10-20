@@ -1,5 +1,12 @@
 ﻿namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSystemBasic
 {
+    public enum FsbDataCompression
+    {
+        None,
+        PixelDataFileOptimized,
+        SourcePixelDataFileOptimized,
+    }
+
     public class FsbFileInfo
     {
         public string Filename { get; }
@@ -9,6 +16,7 @@
         public int FileIndex { get; set; }
         public FsbFile FsbFile { get; } = new FsbFile();
         public bool IsDummy { get; set; }
+        public FsbDataCompression DataCompression { get; set; } = FsbDataCompression.None;
 
         // File Properties 
         //

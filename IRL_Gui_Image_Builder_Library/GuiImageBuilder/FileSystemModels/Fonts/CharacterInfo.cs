@@ -2,6 +2,13 @@
 
 namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
 {
+    public enum  FontDataCompression
+    {
+        None,
+        PixelDataFileOptimized,
+        SourcePixelDataFileOptimized,
+    }
+
     public class CharacterInfo
     {
         public FsFont Font { get; private set; }
@@ -10,9 +17,10 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
         public byte ASSCI { get; private set; }
         public uint DataOffset { get; set; }
         public uint DataSize { get; set; }
-        public uint DataOffsetCompressed { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
+        public FontDataCompression DataCompression { get; set; } = FontDataCompression.None;
+        public uint CompressedPixels { get; set; }
 
         public CharacterInfo(FsFont font, byte assci, string filepath, string fileExtension)
         {
@@ -46,6 +54,23 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts
         public static int GetSize()
         {
             return 6;
+        }
+
+        public void UpdateValues(uint dataOffset, ushort width, ushort height, uint dataSize)
+        {
+            DataOffset = dataOffset;
+            Width = width;
+            Height = height;
+            DataSize = dataSize;
+        }
+
+        public void UpdateValues(uint dataOffset, ushort width, ushort height, uint dataSize, uint compressedPixels)
+        {
+            DataOffset = dataOffset;
+            Width = width;
+            Height = height;
+            DataSize = dataSize;
+            CompressedPixels = compressedPixels;
         }
     }
 }

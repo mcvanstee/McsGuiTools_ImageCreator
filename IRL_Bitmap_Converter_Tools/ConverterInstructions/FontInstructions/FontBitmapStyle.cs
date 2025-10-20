@@ -18,6 +18,9 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions
         [XmlElement]
         public bool MonospaceNumbers { get; set; }
 
+        [XmlElement]
+        public bool DigitsOnly { get; set; }
+
         [XmlIgnore]
         public Color TextColor { get; set; } = Color.Black;
 
