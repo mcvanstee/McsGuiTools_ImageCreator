@@ -52,7 +52,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             if (builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
             {
                 sw.WriteLine("{");
-                WriteFileSearch(sw);
+                WriteFileSearch(sw, builderSettings.FileSystemFormat.FileFormat);
                 sw.WriteLine("}");
             }
             else
@@ -113,7 +113,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             return maxPropertyValues;
         }
 
-        private static void WriteFileSearch(StreamWriter sw)
+        private static void WriteFileSearch(StreamWriter sw, FileFormat fileFormat)
         {
             sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key - 1;");
             sw.WriteLine("");
@@ -122,7 +122,14 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("        return FILE_SEARCH_OUT_OF_BOUNDS;");
             sw.WriteLine("    }");
             sw.WriteLine("");
-            sw.WriteLine("    *p_dataLocation = (fileIndex < FS_FILES_START_PIXEL_DATA_INDEX) ? FS_FILE_LOCATION_CODE : FS_FILE_LOCATION_PIXEL_DATA;");
+            if (fileFormat == FileFormat.OptimizedImage)
+            {
+                sw.WriteLine("    *p_dataLocation = (fileIndex < FS_FILES_START_PIXEL_DATA_INDEX) ? FS_FILE_LOCATION_CODE : FS_FILE_LOCATION_PIXEL_DATA;");
+            }
+            else
+            {
+                sw.WriteLine("    *p_dataLocation = 0;");
+            }
             sw.WriteLine("");
             sw.WriteLine("    if (0U == propertiesLength)");
             sw.WriteLine("    {");
