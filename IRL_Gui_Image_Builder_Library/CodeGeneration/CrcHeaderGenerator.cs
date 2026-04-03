@@ -1,16 +1,16 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.Projects;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class CrcHeaderGenerator
     {
-        public static void CreateCrcHeader(string projectPath)
+        public static void CreateCrcHeader()
         {
-            StreamWriter sw = new StreamWriter(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.CrcFile + ".h");
+            string filePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.CRC_FILE + ".h");
+            StreamWriter sw = new StreamWriter(filePath);
 
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.CrcFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.CRC_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.IncludeStdInt(sw);
@@ -24,7 +24,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.SearchTreeFile);
+            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.SEARCH_TREE_FILE);
 
             sw.Close();
         }

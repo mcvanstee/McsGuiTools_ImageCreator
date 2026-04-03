@@ -1,22 +1,22 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.Projects;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class FSColorHeaderGenerator
     {
-        public static void CreateColorHeader(List <FSColor> colors, string projectPath)
+        public static void CreateColorHeader(List <FSColor> colors)
         {
             if (colors.Count == 0)
             {
                 return;
             }
 
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.ColorFile + ".h");
+            string headerFilePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.COLOR_FILE + ".h");
+            StreamWriter sw = new(headerFilePath);
 
             CodeGenegrationUtils.AddCopyRight(sw);
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.VersionFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.VERSION_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
 
@@ -30,7 +30,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.VersionFile);
+            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.VERSION_FILE);
 
             sw.Close();
         }

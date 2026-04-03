@@ -1,5 +1,4 @@
 ﻿using IRL_Common_Library.Utils;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -8,6 +7,31 @@ namespace IRL_Bitmap_Converter_Tools.Converters
     public static class StringToBitmapConverter
     {
         public static void GenerateImage(
+            string text, Font font,
+            int leftMargin, int topMargin, int rightMargin, int bottomMargin,
+            Color textColor, Color backColor,
+            string path, string filename)
+        {
+            if (text.Contains(Environment.NewLine) || text.Contains('\n') || text.Contains("\\n"))
+            {
+                GenerateImageMultiLine(text, font, leftMargin, topMargin, rightMargin, bottomMargin, textColor, backColor, path, filename);
+            }
+            else
+            {
+                GenerateImageSingleLine(text, font, leftMargin, topMargin, rightMargin, bottomMargin, textColor, backColor, path, filename);
+            }
+        }
+
+        public static SizeF MeasureStringSize(string text, Font font)
+        {
+            using Image image = new Bitmap(2048, 512, System.Drawing.Imaging.PixelFormat.Format64bppArgb);
+            using Graphics graphics = Graphics.FromImage(image);
+            SizeF textSize = graphics.MeasureString(text, font);
+
+            return textSize;
+        }
+
+        private static void GenerateImageSingleLine(
             string text, Font font,
             int leftMargin, int topMargin, int rightMargin, int bottomMargin,
             Color textColor, Color backColor,
@@ -29,14 +53,58 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             stream.Close();
         }
 
-        public static SizeF MeasureStringSize(string text, Font font)
+        private static void GenerateImageMultiLine(
+            string text, Font font,
+            int leftMargin, int topMargin, int rightMargin, int bottomMargin,
+            Color textColor, Color backColor,
+            string path, string filename)
         {
-            using Image image = new Bitmap(2048, 512, System.Drawing.Imaging.PixelFormat.Format64bppArgb);
-            using Graphics graphics = Graphics.FromImage(image);
-            SizeF textSize = graphics.MeasureString(text, font);
+            List<string> lines = new List<string>();
+            lines.AddRange(text.Split([Environment.NewLine, "\n", "\\n"], StringSplitOptions.None));
 
-            return textSize;
+            SizeF textBlockSize = MeasureStringSize(lines[0], font);
+            float lineHeight = textBlockSize.Height;
+
+            for (int i = 1; i < lines.Count; i++)
+            {
+                SizeF size = MeasureStringSize(lines[i], font);
+                if (textBlockSize.Width < size.Width)
+                {
+                    textBlockSize.Width = size.Width;
+                }
+
+                textBlockSize.Height += size.Height;
+            }
+
+            List<Image> lineImages = new List<Image>();
+
+            foreach (string line in lines)
+            {
+                SizeF textSize = MeasureStringSize(line, font);
+                lineImages.Add(GetBitmap(
+                    (int)textSize.Width, (int)textSize.Height,
+                    leftMargin, topMargin, rightMargin, bottomMargin,
+                    line, font, textColor, backColor));
+            }
+
+            using Image image = new Bitmap((int)textBlockSize.Width, (int)textBlockSize.Height);
+            using Graphics graphics = Graphics.FromImage(image);
+            graphics.Clear(backColor);
+            foreach (Image lineImage in lineImages)
+            {
+                graphics.DrawImage(lineImage, 0, lineImages.IndexOf(lineImage) * lineHeight);
+            }
+
+            string filePath = FileUtils.CreateUniqeFileName(path, filename, ".png");
+
+            using MemoryStream ms = new();
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+            using FileStream stream = new(filePath, FileMode.CreateNew, FileAccess.ReadWrite);
+            stream.Write(ms.ToArray());
+            stream.Close();
         }
+
 
         private static Bitmap GetBitmap(
             int width, int height,
@@ -75,7 +143,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             int strY = topMargin;
 
             graphics.SmoothingMode = SmoothingMode.HighQuality;
-            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;// GridFit;
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             graphics.TextContrast = 4;
             graphics.Clear(backColor);

@@ -1,22 +1,22 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class VersionHeaderGenerator
     {
-        public static void CreateVersionHeader(ImageBuilderSettings builderSettings, string projectPath)
+        public static void CreateVersionHeader(ImageBuilderSettings builderSettings)
         {
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.VersionFile + ".h");
+            string versionFilePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.VERSION_FILE + ".h");
+            StreamWriter sw = new(versionFilePath);
 
             string version = builderSettings.GetVerion().Replace(".", "_");
-            string dataFileName = builderSettings.GuiPixelDataFile + "_" + version;
+            string dataFileName = builderSettings.GuiPixelDataFile + "_" + version + FileConstants.IMAGE_FILE_EXTENSION;
             string value = "\"" + dataFileName + "\"";
 
             CodeGenegrationUtils.AddCopyRight(sw);
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.VersionFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.VERSION_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddVersion(sw, builderSettings);
@@ -25,7 +25,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.VersionFile);
+            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.VERSION_FILE);
 
             sw.Close();
         }

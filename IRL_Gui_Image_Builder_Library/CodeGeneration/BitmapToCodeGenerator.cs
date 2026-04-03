@@ -1,29 +1,30 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Common_Library.Utils;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Gui_Image_Builder_Library.Converters;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
 using System.Drawing;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class BitmapToCodeGenerator
     {
-        public static void CreateFiles(ImageBuilderSettings builderSettings, string projectPath)
+        public static void CreateFiles(ImageBuilderSettings builderSettings)
         {
-            string[] files = Directory.GetFiles(projectPath + FileConstants.BmpImportFolder);
+            string[] files = Directory.GetFiles(FileConstants.GetBmpImportFolder());
 
-            CreateHeaderFile(builderSettings, projectPath, files);
-            CreateCodeFile(builderSettings, projectPath, files);
+            CreateHeaderFile(builderSettings, files);
+            CreateCodeFile(builderSettings, files);
         }
 
-        private static void CreateHeaderFile(ImageBuilderSettings builderSettings, string projectPath, string[] files)
+        private static void CreateHeaderFile(ImageBuilderSettings builderSettings, string[] files)
         {
-            StreamWriter sw = new StreamWriter(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.BitmapDataFile + ".h");
+            string headerFilePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.BITMAP_DATA_FILE + ".h");
+            StreamWriter sw = new StreamWriter(headerFilePath);
             string pixelDataSize = builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? "uint32_t" : "uint16_t";
 
             CodeGenegrationUtils.AddCopyRight(sw);
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.BitmapDataFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.BITMAP_DATA_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.IncludeStdInt(sw);
@@ -47,17 +48,18 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.BitmapDataFile);
+            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.BITMAP_DATA_FILE);
 
             sw.Close();
         }
 
-        private static void CreateCodeFile(ImageBuilderSettings builderSettings, string projectPath, string[] files)
+        private static void CreateCodeFile(ImageBuilderSettings builderSettings, string[] files)
         {
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.BitmapDataFile + ".c");
+            string codeFilePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.BITMAP_DATA_FILE + ".c");
+            StreamWriter sw = new(codeFilePath);
             string pixelDataSize = builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? "uint32_t" : "uint16_t";
 
-            CodeGenegrationUtils.Include(sw, FileConstants.BitmapDataFile);
+            CodeGenegrationUtils.Include(sw, FileConstants.BITMAP_DATA_FILE);
             CodeGenegrationUtils.BlankLine(sw);
 
             foreach (string filePath in files)

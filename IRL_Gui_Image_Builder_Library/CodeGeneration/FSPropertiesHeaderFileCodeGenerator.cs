@@ -1,22 +1,22 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSystemBasic;
-using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class FSPropertiesHeaderFileCodeGenerator
     {
-        public static void CreateFileKeyHeader(ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder)
+        public static void CreateFileKeyHeader(ImageBuilderSettings settings, FsbBuilder fsbBuilder)
         {
-            ImageBuilderSettings settings = builderSettings;
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.SearchTreeFile + ".h");
+            string headerFilePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.SEARCH_TREE_FILE + ".h");
+            StreamWriter sw = new(headerFilePath);
             int bytesPerPixel = settings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? 3 : 2;
-            int longestFileKeyLength = GetLongestFileKeyLength(fsbBuilder.FsbFileInfos);
+            int longestFileKeyLength = GetLongestFileKeyLength(fsbBuilder.FileInfos);
 
             CodeGenegrationUtils.AddCopyRight(sw);
-            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.SearchTreeFile);
+            CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.SEARCH_TREE_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.IncludeStdBool(sw);
@@ -24,17 +24,8 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.DefineIfNotDefined(sw, "FS_PIXEL_DATA_CRC", fsbBuilder.CRC.ToString() + "u");
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.Define(sw, "FS_FILES", fsbBuilder.FsbFileInfos.Count.ToString());
-
-            if (builderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage)
-            {
-                CodeGenegrationUtils.Define(sw, "FS_FILES_OPTIMIZED", fsbBuilder.NoOfOptimizedFiles.ToString());
-                CodeGenegrationUtils.Define(sw, "FS_FILES_PIXEL_DATA", fsbBuilder.NoOfPixelDataFiles.ToString());
-                CodeGenegrationUtils.Define(sw, "FS_FILES_START_PIXEL_DATA_INDEX", fsbBuilder.NoOfOptimizedFiles.ToString());
-                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_CODE", "0");
-                CodeGenegrationUtils.Define(sw, "FS_FILE_LOCATION_PIXEL_DATA", "1");
-            }
-
+            CodeGenegrationUtils.Define(sw, "FS_FILES", fsbBuilder.FileInfos.Count.ToString());
+            CodeGenegrationUtils.AddDataLocationCompressionTypesDefines(sw, fsbBuilder.DataLocations);
             CodeGenegrationUtils.Define(sw, "FS_MAX_FILE_PROPERTIES", settings.PropertiesUsed + "U");
             CodeGenegrationUtils.Define(sw, "FS_BYTES_PER_PIXEL", bytesPerPixel.ToString());
             CodeGenegrationUtils.BlankLine(sw);
@@ -57,6 +48,8 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddFileSearchResultEnum(sw);
             CodeGenegrationUtils.BlankLine(sw);
+            CodeGenegrationUtils.AddDataLocations(sw, fsbBuilder.DataLocations);
+            CodeGenegrationUtils.BlankLine(sw);
             AddProperties(sw, settings);
             CodeGenegrationUtils.BlankLine(sw);
             AddPropertyValues(sw, settings);
@@ -66,7 +59,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("{");
             sw.WriteLine("    FILE_KEY_NONE = 0,");
 
-            foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FsbFileInfos)
+            foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FileInfos)
             {
                 string key = "FILE_KEY_";
                 string fileIndexStr = (fsbFileInfo.FileIndex + 1).ToString();
@@ -105,10 +98,12 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("                            fs_file_info_s *p_out_file_info,");
             sw.WriteLine("                            uint8_t *p_dataLocation);");
             CodeGenegrationUtils.BlankLine(sw);
+            sw.WriteLine("fs_compression_e fs_getCompression(const fs_data_location_e dataLocation);");
+            CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.AddExternCEnd(sw);
             CodeGenegrationUtils.BlankLine(sw);
-            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.SearchTreeFile);
+            CodeGenegrationUtils.AddHeaderGuardEnd(sw, FileConstants.SEARCH_TREE_FILE);
 
             sw.Close();
         }

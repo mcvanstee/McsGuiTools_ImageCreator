@@ -1,10 +1,11 @@
 ﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
 using System.Xml.Serialization;
 using IRL_Common_Library.Consts;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
 
 namespace IRL_Image_Creator.Projects
 {
@@ -13,9 +14,6 @@ namespace IRL_Image_Creator.Projects
     {
         [XmlElement]
         public string Name { get; set; } = "";
-
-        [XmlElement]
-        public string ProjectFolder { get; set; } = "";
 
         [XmlElement]
         public string UserSourceFolder { get; set; } = "";
@@ -46,12 +44,14 @@ namespace IRL_Image_Creator.Projects
             Project project = new()
             {
                 Name = name,
-                ProjectFolder = folder
             };
 
+            Environment.CurrentDirectory = folder ?? Environment.CurrentDirectory;
+
+            project.ImageBuilderSettings.DataLocations.Add(new DataLocation(0, DataLocationType.File_1, CompressionType.None));
             Save(project);
 
-            CreateProjectFolders(project.ProjectFolder);
+            CreateProjectFolders();
 
             return project;
         }
@@ -59,7 +59,8 @@ namespace IRL_Image_Creator.Projects
         public static Project Open(FileInfo fileInfo)
         {
             Project project = new();
-            string projectPath = fileInfo.FullName.Replace($"\\{fileInfo.Name}", "");
+
+            Environment.CurrentDirectory = fileInfo.DirectoryName ?? Environment.CurrentDirectory;
 
             using FileStream stream = new(fileInfo.FullName, FileMode.Open, FileAccess.Read);
             XmlSerializer serializer = new(project.GetType());
@@ -67,19 +68,14 @@ namespace IRL_Image_Creator.Projects
             project = (Project)serializer.Deserialize(stream);
             stream.Close();
 
-            if (project.ProjectFolder != projectPath)
-            {
-                project.ProjectFolder = projectPath;
-            }
-
-            CreateProjectFolders(projectPath);
+            CreateProjectFolders();
 
             return project;
         }
 
         public static void Save(Project project)
         {
-            if (string.IsNullOrEmpty(project.Name) || string.IsNullOrEmpty(project.ProjectFolder))
+            if (string.IsNullOrEmpty(project.Name))
             {
                 return;
             }
@@ -92,17 +88,16 @@ namespace IRL_Image_Creator.Projects
 
         public static string GetFullFilePath(Project project)
         {
-            return $"{project.ProjectFolder}\\{project.Name}{FileConstants.ProjectFileExtension}";
+            return Path.Combine(Environment.CurrentDirectory, project.Name + FileConstants.PROJECT_FILE_EXTENSION);
         }
 
-        private static void CreateProjectFolders(string path)
+        private static void CreateProjectFolders()
         {
-            Directory.CreateDirectory(path + FileConstants.LogFolder);
-            Directory.CreateDirectory(path + FileConstants.BmpImportFolder);
-            Directory.CreateDirectory(path + FileConstants.FontImportFolder);
-
-            Directory.CreateDirectory(path + FileConstants.BuildFolder);
-            Directory.CreateDirectory(path + FileConstants.SourceFolder);
+            Directory.CreateDirectory(FileConstants.GetLogFolder());
+            Directory.CreateDirectory(FileConstants.GetBmpImportFolder());
+            Directory.CreateDirectory(FileConstants.GetFontImportFolder());
+            Directory.CreateDirectory(FileConstants.GetConverterOutputFolder());
+            Directory.CreateDirectory(FileConstants.GetSourceFolder());
         }
 
         public static void UpdateTextStyleFonts(Project project)

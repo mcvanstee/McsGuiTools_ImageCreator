@@ -25,6 +25,12 @@
     <Compile Update="Windows\ColorForms\SelectColorForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Windows\DataLocationForms\DataLocationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\DataLocationForms\EditDataLocationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Windows\FilePropertyForms\EditPropertyNamesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,6 +68,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Windows\IconStyleForms\SelectColorIdForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Windows\IconStyleForms\SelectIconDataLocationForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Windows\IconStyleForms\SelectIconStyleForm.cs">

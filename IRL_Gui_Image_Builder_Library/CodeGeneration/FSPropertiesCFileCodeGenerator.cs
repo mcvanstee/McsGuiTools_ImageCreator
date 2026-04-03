@@ -1,39 +1,31 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.FileSystemBasic;
-using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 {
     public static class FSPropertiesCFileCodeGenerator
     {
-        public static void CreateFileSystemCFile(ImageBuilderSettings builderSettings, string projectPath, FsbBuilder fsbBuilder)
+        public static void CreateFileSystemCFile(ImageBuilderSettings builderSettings, FsbBuilder fsbBuilder)
         {
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.SearchTreeFile + ".c");
+            string filePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.SEARCH_TREE_FILE + ".c");
+            StreamWriter sw = new(filePath);
 
-            CodeGenegrationUtils.Include(sw, FileConstants.SearchTreeFile);
+            CodeGenegrationUtils.Include(sw, FileConstants.SEARCH_TREE_FILE);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.Define(sw, "FS_FILE_INFO_SIZE", fsbBuilder.SizeOfFileInfo.ToString());
             CodeGenegrationUtils.Define(sw, "FS_FILE_DUMMY", "0xFFFFFFFFU");
             CodeGenegrationUtils.BlankLine(sw);
 
-            if (builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
+            sw.WriteLine("const fs_file_info_s fs_file_infos[] =");
+            sw.WriteLine("{                                                                      /* filename, fileproperty, datalocation */");
+            foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FileInfos)
             {
-                sw.WriteLine("const fs_file_info_s fs_file_infos[] =");
-                sw.WriteLine("{");
-                foreach (FsbFileInfo fsbFileInfo in fsbBuilder.FsbFileInfos)
-                {
-                    WriteFileInfo(sw, fsbFileInfo, builderSettings.PropertiesUsed, builderSettings.FileSystemFormat.FileFormat);
-                }
-                sw.WriteLine("};");
+                WriteFileInfo(sw, fsbFileInfo, builderSettings.PropertiesUsed);
             }
-            else
-            {
-                sw.WriteLine("extern bool fs_readData(const int32_t offset, uint8_t *p_out_data, const int32_t size);");
-                CodeGenegrationUtils.BlankLine(sw);
-                sw.WriteLine("static bool fs_readFileInfo(const int32_t offset, fs_file_info_s *p_out_file_info);");
-            }
+            sw.WriteLine("};");
 
             CodeGenegrationUtils.BlankLine(sw);
             sw.WriteLine("const uint8_t maxProperty[FS_MAX_FILE_PROPERTIES] =");
@@ -48,45 +40,35 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("                            const uint8_t propertiesLength,");
             sw.WriteLine("                            fs_file_info_s *p_out_file_info,");
             sw.WriteLine("                            uint8_t *p_dataLocation)");
+            sw.WriteLine("{");
+            WriteFileSearch(sw, fsbBuilder);
+            sw.WriteLine("}");
 
-            if (builderSettings.FileSystemFormat.SeparateSearchTreeFromData)
-            {
-                sw.WriteLine("{");
-                WriteFileSearch(sw, builderSettings.FileSystemFormat.FileFormat);
-                sw.WriteLine("}");
-            }
-            else
-            {
-                sw.WriteLine("{");
-                WriteFileSearchInDataFile(sw);
-                sw.WriteLine("}");
-                CodeGenegrationUtils.BlankLine(sw);
-                WriteReadFileInfoFuncion(sw, fsbBuilder.SizeOfFileInfo);
-            }
-
+            CodeGenegrationUtils.BlankLine(sw);
+            CodeGenegrationUtils.AddFileCompressionFunction(sw, fsbBuilder.DataLocations);
             CodeGenegrationUtils.BlankLine(sw);
             CodeGenegrationUtils.EndOfFile(sw);
 
             sw.Close();
         }
 
-        public static void WriteFileInfo(StreamWriter sw, FsbFileInfo fsbFileInfo, int maxProperties, FileFormat fileFormat)
+        public static void WriteFileInfo(StreamWriter sw, FsbFileInfo fsbFileInfo, int maxProperties)
         {
             FsbFile file = fsbFileInfo.FsbFile;
 
-            string dataOffsetStr = file.DataOffset.ToString();
-            string compressedPixelsStr = "";
+            string dataOffsetStr = $"0x{file.DataOffset.ToString("X8")}";
+            string dataLocationStr = $"{fsbFileInfo.DataLocation.LocationID}";
 
-            if (fileFormat == FileFormat.OptimizedImage)
+            if (!string.IsNullOrEmpty(fsbFileInfo.DataLocation.Name))
             {
-                compressedPixelsStr = $" Optimized pixels: {file.CompressedPixels.ToString()}";
+                dataLocationStr = $"{fsbFileInfo.DataLocation.LocationID} - {fsbFileInfo.DataLocation.Name}";
             }
 
             if (maxProperties != 0)
             {
                 string propertiesStr = ", .properties = " + file.Properties;
                 string filename = fsbFileInfo.IsDummy ? "Dummy file, " + fsbFileInfo.FileKey : fsbFileInfo.Filename;
-                string comment = "    /* " + filename + ", " + Convert.ToString(file.Properties, 2) + compressedPixelsStr + " */";
+                string comment = $"    /* {filename}, {Convert.ToString(file.Properties, 2)}, {dataLocationStr} */";
 
                 sw.WriteLine("    { .dataOffset = " + dataOffsetStr + propertiesStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " }," + comment);
             }
@@ -113,7 +95,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             return maxPropertyValues;
         }
 
-        private static void WriteFileSearch(StreamWriter sw, FileFormat fileFormat)
+        private static void WriteFileSearch(StreamWriter sw, FsbBuilder fsbBuilder)
         {
             sw.WriteLine("    const int32_t fileIndex = (int32_t)file_key - 1;");
             sw.WriteLine("");
@@ -122,14 +104,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("        return FILE_SEARCH_OUT_OF_BOUNDS;");
             sw.WriteLine("    }");
             sw.WriteLine("");
-            if (fileFormat == FileFormat.OptimizedImage)
-            {
-                sw.WriteLine("    *p_dataLocation = (fileIndex < FS_FILES_START_PIXEL_DATA_INDEX) ? FS_FILE_LOCATION_CODE : FS_FILE_LOCATION_PIXEL_DATA;");
-            }
-            else
-            {
-                sw.WriteLine("    *p_dataLocation = 0;");
-            }
+            CodeGenegrationUtils.WriteDataLocationFileIndex(sw, fsbBuilder);
             sw.WriteLine("");
             sw.WriteLine("    if (0U == propertiesLength)");
             sw.WriteLine("    {");
@@ -138,7 +113,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("        return FILE_SEARCH_OK;");
             sw.WriteLine("    }");
             sw.WriteLine("");
-            sw.WriteLine("    if (FS_MAX_FILE_PROPERTIES != propertiesLength)");
+            sw.WriteLine("    if (FS_MAX_FILE_PROPERTIES > propertiesLength)");
             sw.WriteLine("    {");
             sw.WriteLine("        return FILE_SEARCH_PROPERTY_LENGTH;");
             sw.WriteLine("    }");

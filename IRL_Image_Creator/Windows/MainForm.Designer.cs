@@ -39,6 +39,7 @@
             OpenToolStripMenuItem = new ToolStripMenuItem();
             SaveToolStripMenuItem = new ToolStripMenuItem();
             projectToolStripMenuItem = new ToolStripMenuItem();
+            dataLocationToolStripMenuItem = new ToolStripMenuItem();
             propertiesToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
             textStylesToolStripMenuItem = new ToolStripMenuItem();
@@ -61,19 +62,21 @@
             panel7 = new Panel();
             tableLayoutPanel1 = new TableLayoutPanel();
             InputTextFileGroupBox = new GroupBox();
+            label2 = new Label();
+            textDataLocationComboBox = new ComboBox();
             fileKeyPrefixTextTB = new TextBox();
             ImportTextBtn = new Button();
             label27 = new Label();
             TextInfoGroupBox = new GroupBox();
             tableLayoutPanel2 = new TableLayoutPanel();
-            TextToConvertListView = new ListView();
+            textToConvertListView = new ListView();
             keyCH = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
             tableLayoutPanel3 = new TableLayoutPanel();
             DeleteTextStyleButton = new Button();
             AddTextStyleButton = new Button();
             panel5 = new Panel();
-            TextInstructionListView = new ListView();
+            textInstructionListView = new ListView();
             tableLayoutPanel4 = new TableLayoutPanel();
             AddTextInstructionBtn = new Button();
             DeleteTextInstructionBtn = new Button();
@@ -90,6 +93,8 @@
             EditFontButton = new Button();
             SelectFontStyleButton = new Button();
             panel9 = new Panel();
+            groupBox8 = new GroupBox();
+            fontDataLocationComboBox = new ComboBox();
             groupBox5 = new GroupBox();
             FontKeyProjectFnRB = new RadioButton();
             FontKeyBothRB = new RadioButton();
@@ -107,6 +112,7 @@
             svgXMLViewer = new RichTextBox();
             tableLayoutPanel13 = new TableLayoutPanel();
             panel8 = new Panel();
+            selectDataLocationButton = new Button();
             EditIconNameButton = new Button();
             SelectIconStyleButton = new Button();
             DeleteImagesButton = new Button();
@@ -116,6 +122,7 @@
             columnHeader6 = new ColumnHeader();
             columnHeader4 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
+            columnHeader5 = new ColumnHeader();
             panel3 = new Panel();
             tableLayoutPanel6 = new TableLayoutPanel();
             panelWithBorder3 = new IRL_Image_Creator.CustomComponents.Panels.PanelWithBorder();
@@ -125,17 +132,6 @@
             SwapBytesCheckBox = new CheckBox();
             RGB24RadioButton = new RadioButton();
             RGB565RadioButton = new RadioButton();
-            FontFormatGroupBox = new GroupBox();
-            IncludeCharInfoInImageCheckBox = new CheckBox();
-            FileFormatGroupBox = new GroupBox();
-            CompressBasicImagePixeldataCheckBox = new CheckBox();
-            CompressOptimizedPixelDataCheckBox = new CheckBox();
-            CreatePixelDataFileCheckBox = new CheckBox();
-            OptimizedImageRadioButton = new RadioButton();
-            IncludeFileInfoInImageCheckbox = new CheckBox();
-            SingleFileRadioButton = new RadioButton();
-            IncludeWidthAndHeightCheckbox = new CheckBox();
-            ImageFileRadioButton = new RadioButton();
             groupBox3 = new GroupBox();
             SourceCopyToFolderLabel = new Label();
             SelectUserFolderButton = new Button();
@@ -160,6 +156,7 @@
             FileDialog = new OpenFileDialog();
             folderBrowserDialog = new FolderBrowserDialog();
             toolTipMainForm = new ToolTip(components);
+            contextMenuStrip1 = new ContextMenuStrip(components);
             statusStrip.SuspendLayout();
             menuStrip1.SuspendLayout();
             MainTableLayoutPanel.SuspendLayout();
@@ -181,6 +178,7 @@
             tableLayoutPanel5.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
             panel9.SuspendLayout();
+            groupBox8.SuspendLayout();
             groupBox5.SuspendLayout();
             ImageTab.SuspendLayout();
             tableLayoutPanel12.SuspendLayout();
@@ -198,8 +196,6 @@
             panelWithBorder3.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
             PixelDataGroupBox.SuspendLayout();
-            FontFormatGroupBox.SuspendLayout();
-            FileFormatGroupBox.SuspendLayout();
             groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)VersionRevisionInput).BeginInit();
             ((System.ComponentModel.ISupportInitialize)VersionPatchInput).BeginInit();
@@ -268,79 +264,86 @@
             // 
             // projectToolStripMenuItem
             // 
-            projectToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { propertiesToolStripMenuItem, toolStripSeparator2, textStylesToolStripMenuItem, fontStylesToolStripMenuItem, iconStylesToolStripMenuItem, toolStripSeparator3, colorsToolStripMenuItem, fontsToolStripMenuItem, toolStripSeparator1, importToolStripMenuItem, exportToolStripMenuItem });
+            projectToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { dataLocationToolStripMenuItem, propertiesToolStripMenuItem, toolStripSeparator2, textStylesToolStripMenuItem, fontStylesToolStripMenuItem, iconStylesToolStripMenuItem, toolStripSeparator3, colorsToolStripMenuItem, fontsToolStripMenuItem, toolStripSeparator1, importToolStripMenuItem, exportToolStripMenuItem });
             projectToolStripMenuItem.Name = "projectToolStripMenuItem";
             projectToolStripMenuItem.Size = new Size(56, 20);
             projectToolStripMenuItem.Text = "Project";
             // 
+            // dataLocationToolStripMenuItem
+            // 
+            dataLocationToolStripMenuItem.Name = "dataLocationToolStripMenuItem";
+            dataLocationToolStripMenuItem.Size = new Size(147, 22);
+            dataLocationToolStripMenuItem.Text = "Data Location";
+            dataLocationToolStripMenuItem.Click += dataLocationToolStripMenuItem_Click;
+            // 
             // propertiesToolStripMenuItem
             // 
             propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            propertiesToolStripMenuItem.Size = new Size(131, 22);
+            propertiesToolStripMenuItem.Size = new Size(147, 22);
             propertiesToolStripMenuItem.Text = "Properties";
             propertiesToolStripMenuItem.Click += propertiesToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(128, 6);
+            toolStripSeparator2.Size = new Size(144, 6);
             // 
             // textStylesToolStripMenuItem
             // 
             textStylesToolStripMenuItem.Name = "textStylesToolStripMenuItem";
-            textStylesToolStripMenuItem.Size = new Size(131, 22);
+            textStylesToolStripMenuItem.Size = new Size(147, 22);
             textStylesToolStripMenuItem.Text = "Text Styles";
             textStylesToolStripMenuItem.Click += textStylesToolStripMenuItem_Click;
             // 
             // fontStylesToolStripMenuItem
             // 
             fontStylesToolStripMenuItem.Name = "fontStylesToolStripMenuItem";
-            fontStylesToolStripMenuItem.Size = new Size(131, 22);
+            fontStylesToolStripMenuItem.Size = new Size(147, 22);
             fontStylesToolStripMenuItem.Text = "Font Styles";
             fontStylesToolStripMenuItem.Click += fontStylesToolStripMenuItem_Click;
             // 
             // iconStylesToolStripMenuItem
             // 
             iconStylesToolStripMenuItem.Name = "iconStylesToolStripMenuItem";
-            iconStylesToolStripMenuItem.Size = new Size(131, 22);
+            iconStylesToolStripMenuItem.Size = new Size(147, 22);
             iconStylesToolStripMenuItem.Text = "Icon Styles";
             iconStylesToolStripMenuItem.Click += iconStylesToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(128, 6);
+            toolStripSeparator3.Size = new Size(144, 6);
             // 
             // colorsToolStripMenuItem
             // 
             colorsToolStripMenuItem.Name = "colorsToolStripMenuItem";
-            colorsToolStripMenuItem.Size = new Size(131, 22);
+            colorsToolStripMenuItem.Size = new Size(147, 22);
             colorsToolStripMenuItem.Text = "Colors";
             colorsToolStripMenuItem.Click += colorsToolStripMenuItem_Click;
             // 
             // fontsToolStripMenuItem
             // 
             fontsToolStripMenuItem.Name = "fontsToolStripMenuItem";
-            fontsToolStripMenuItem.Size = new Size(131, 22);
+            fontsToolStripMenuItem.Size = new Size(147, 22);
             fontsToolStripMenuItem.Text = "Fonts";
             fontsToolStripMenuItem.Click += fontsToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(128, 6);
+            toolStripSeparator1.Size = new Size(144, 6);
             // 
             // importToolStripMenuItem
             // 
             importToolStripMenuItem.Name = "importToolStripMenuItem";
-            importToolStripMenuItem.Size = new Size(131, 22);
+            importToolStripMenuItem.Size = new Size(147, 22);
             importToolStripMenuItem.Text = "Import";
             importToolStripMenuItem.Click += importToolStripMenuItem_Click;
             // 
             // exportToolStripMenuItem
             // 
             exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            exportToolStripMenuItem.Size = new Size(131, 22);
+            exportToolStripMenuItem.Size = new Size(147, 22);
             exportToolStripMenuItem.Text = "Export";
             exportToolStripMenuItem.Click += exportToolStripMenuItem_Click;
             // 
@@ -453,6 +456,8 @@
             // 
             // InputTextFileGroupBox
             // 
+            InputTextFileGroupBox.Controls.Add(label2);
+            InputTextFileGroupBox.Controls.Add(textDataLocationComboBox);
             InputTextFileGroupBox.Controls.Add(fileKeyPrefixTextTB);
             InputTextFileGroupBox.Controls.Add(ImportTextBtn);
             InputTextFileGroupBox.Controls.Add(label27);
@@ -463,6 +468,26 @@
             InputTextFileGroupBox.TabIndex = 2;
             InputTextFileGroupBox.TabStop = false;
             InputTextFileGroupBox.Text = "Text";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(427, 20);
+            label2.Name = "label2";
+            label2.Size = new Size(80, 15);
+            label2.TabIndex = 4;
+            label2.Text = "Data Location";
+            // 
+            // textDataLocationComboBox
+            // 
+            textDataLocationComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            textDataLocationComboBox.FormattingEnabled = true;
+            textDataLocationComboBox.Location = new Point(508, 16);
+            textDataLocationComboBox.Name = "textDataLocationComboBox";
+            textDataLocationComboBox.Size = new Size(170, 23);
+            textDataLocationComboBox.TabIndex = 3;
+            textDataLocationComboBox.SelectedIndexChanged += TextDataLocationComboBox_SelectedIndexChanged;
+            textDataLocationComboBox.SelectedValueChanged += TextDataLocationComboBox_SelectedValueChanged;
             // 
             // fileKeyPrefixTextTB
             // 
@@ -506,7 +531,7 @@
             // 
             tableLayoutPanel2.ColumnCount = 1;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Controls.Add(TextToConvertListView, 0, 0);
+            tableLayoutPanel2.Controls.Add(textToConvertListView, 0, 0);
             tableLayoutPanel2.Controls.Add(tableLayoutPanel3, 0, 1);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 19);
@@ -517,19 +542,20 @@
             tableLayoutPanel2.Size = new Size(784, 600);
             tableLayoutPanel2.TabIndex = 12;
             // 
-            // TextToConvertListView
+            // textToConvertListView
             // 
-            TextToConvertListView.Columns.AddRange(new ColumnHeader[] { keyCH, columnHeader3 });
-            TextToConvertListView.Dock = DockStyle.Fill;
-            TextToConvertListView.FullRowSelect = true;
-            TextToConvertListView.GridLines = true;
-            TextToConvertListView.Location = new Point(3, 3);
-            TextToConvertListView.Name = "TextToConvertListView";
-            TextToConvertListView.Size = new Size(778, 560);
-            TextToConvertListView.TabIndex = 0;
-            TextToConvertListView.UseCompatibleStateImageBehavior = false;
-            TextToConvertListView.View = View.Details;
-            TextToConvertListView.SelectedIndexChanged += TextToConvertListView_SelectedIndexChanged;
+            textToConvertListView.Columns.AddRange(new ColumnHeader[] { keyCH, columnHeader3 });
+            textToConvertListView.Dock = DockStyle.Fill;
+            textToConvertListView.FullRowSelect = true;
+            textToConvertListView.GridLines = true;
+            textToConvertListView.Location = new Point(3, 3);
+            textToConvertListView.Name = "textToConvertListView";
+            textToConvertListView.Size = new Size(778, 560);
+            textToConvertListView.TabIndex = 0;
+            textToConvertListView.UseCompatibleStateImageBehavior = false;
+            textToConvertListView.View = View.Details;
+            textToConvertListView.ColumnWidthChanged += textToConvertListView_ColumnWidthChanged;
+            textToConvertListView.SelectedIndexChanged += TextToConvertListView_SelectedIndexChanged;
             // 
             // keyCH
             // 
@@ -580,7 +606,7 @@
             // 
             // panel5
             // 
-            panel5.Controls.Add(TextInstructionListView);
+            panel5.Controls.Add(textInstructionListView);
             panel5.Controls.Add(tableLayoutPanel4);
             panel5.Dock = DockStyle.Left;
             panel5.Location = new Point(0, 0);
@@ -588,16 +614,18 @@
             panel5.Size = new Size(182, 682);
             panel5.TabIndex = 0;
             // 
-            // TextInstructionListView
+            // textInstructionListView
             // 
-            TextInstructionListView.Dock = DockStyle.Fill;
-            TextInstructionListView.Location = new Point(0, 0);
-            TextInstructionListView.Name = "TextInstructionListView";
-            TextInstructionListView.Size = new Size(182, 643);
-            TextInstructionListView.TabIndex = 3;
-            TextInstructionListView.UseCompatibleStateImageBehavior = false;
-            TextInstructionListView.View = View.SmallIcon;
-            TextInstructionListView.ItemSelectionChanged += TextInstructionListView_ItemSelectionChanged;
+            textInstructionListView.Dock = DockStyle.Fill;
+            textInstructionListView.Location = new Point(0, 0);
+            textInstructionListView.MultiSelect = false;
+            textInstructionListView.Name = "textInstructionListView";
+            textInstructionListView.Size = new Size(182, 643);
+            textInstructionListView.TabIndex = 3;
+            textInstructionListView.UseCompatibleStateImageBehavior = false;
+            textInstructionListView.View = View.SmallIcon;
+            textInstructionListView.ItemSelectionChanged += TextInstructionListView_ItemSelectionChanged;
+            textInstructionListView.SelectedIndexChanged += TextInstructionListView_SelectedIndexChanged;
             // 
             // tableLayoutPanel4
             // 
@@ -694,11 +722,11 @@
             // 
             // FontHeader
             // 
-            FontHeader.Text = "Project Font";
+            FontHeader.Text = "Project Fontname";
             // 
             // FontNameHeader
             // 
-            FontNameHeader.Text = "Font";
+            FontNameHeader.Text = "Font name";
             FontNameHeader.Width = 120;
             // 
             // columnHeader1
@@ -770,6 +798,7 @@
             // 
             // panel9
             // 
+            panel9.Controls.Add(groupBox8);
             panel9.Controls.Add(groupBox5);
             panel9.Dock = DockStyle.Fill;
             panel9.Location = new Point(486, 0);
@@ -777,6 +806,26 @@
             panel9.Name = "panel9";
             panel9.Size = new Size(486, 627);
             panel9.TabIndex = 2;
+            // 
+            // groupBox8
+            // 
+            groupBox8.Controls.Add(fontDataLocationComboBox);
+            groupBox8.Location = new Point(3, 132);
+            groupBox8.Name = "groupBox8";
+            groupBox8.Size = new Size(480, 70);
+            groupBox8.TabIndex = 3;
+            groupBox8.TabStop = false;
+            groupBox8.Text = "Data Location";
+            // 
+            // fontDataLocationComboBox
+            // 
+            fontDataLocationComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            fontDataLocationComboBox.FormattingEnabled = true;
+            fontDataLocationComboBox.Location = new Point(6, 26);
+            fontDataLocationComboBox.Name = "fontDataLocationComboBox";
+            fontDataLocationComboBox.Size = new Size(170, 23);
+            fontDataLocationComboBox.TabIndex = 0;
+            fontDataLocationComboBox.SelectedIndexChanged += FontDataLocationComboBox_SelectedIndexChanged;
             // 
             // groupBox5
             // 
@@ -984,6 +1033,7 @@
             // 
             // panel8
             // 
+            panel8.Controls.Add(selectDataLocationButton);
             panel8.Controls.Add(EditIconNameButton);
             panel8.Controls.Add(SelectIconStyleButton);
             panel8.Controls.Add(DeleteImagesButton);
@@ -994,6 +1044,16 @@
             panel8.Name = "panel8";
             panel8.Size = new Size(489, 30);
             panel8.TabIndex = 9;
+            // 
+            // selectDataLocationButton
+            // 
+            selectDataLocationButton.Location = new Point(223, 3);
+            selectDataLocationButton.Name = "selectDataLocationButton";
+            selectDataLocationButton.Size = new Size(128, 23);
+            selectDataLocationButton.TabIndex = 13;
+            selectDataLocationButton.Text = "Select Data Location";
+            selectDataLocationButton.UseVisualStyleBackColor = true;
+            selectDataLocationButton.Click += SelectDataLocationButton_Click;
             // 
             // EditIconNameButton
             // 
@@ -1009,7 +1069,7 @@
             // 
             SelectIconStyleButton.Location = new Point(357, 3);
             SelectIconStyleButton.Name = "SelectIconStyleButton";
-            SelectIconStyleButton.Size = new Size(110, 23);
+            SelectIconStyleButton.Size = new Size(129, 23);
             SelectIconStyleButton.TabIndex = 11;
             SelectIconStyleButton.Text = "Select Icon Style";
             SelectIconStyleButton.UseVisualStyleBackColor = true;
@@ -1052,7 +1112,7 @@
             // 
             // IconListView
             // 
-            IconListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader4, columnHeader2 });
+            IconListView.Columns.AddRange(new ColumnHeader[] { columnHeader6, columnHeader4, columnHeader2, columnHeader5 });
             IconListView.Dock = DockStyle.Fill;
             IconListView.FullRowSelect = true;
             IconListView.GridLines = true;
@@ -1076,6 +1136,10 @@
             // columnHeader2
             // 
             columnHeader2.Text = "Styles";
+            // 
+            // columnHeader5
+            // 
+            columnHeader5.Text = "Data Location";
             // 
             // panel3
             // 
@@ -1115,19 +1179,17 @@
             // 
             tableLayoutPanel7.ColumnCount = 1;
             tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel7.Controls.Add(PixelDataGroupBox, 0, 2);
-            tableLayoutPanel7.Controls.Add(FontFormatGroupBox, 0, 1);
-            tableLayoutPanel7.Controls.Add(FileFormatGroupBox, 0, 0);
-            tableLayoutPanel7.Controls.Add(groupBox3, 0, 3);
+            tableLayoutPanel7.Controls.Add(PixelDataGroupBox, 0, 0);
+            tableLayoutPanel7.Controls.Add(groupBox3, 0, 1);
             tableLayoutPanel7.Dock = DockStyle.Fill;
             tableLayoutPanel7.Location = new Point(0, 0);
             tableLayoutPanel7.Name = "tableLayoutPanel7";
-            tableLayoutPanel7.RowCount = 5;
-            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 230F));
-            tableLayoutPanel7.RowStyles.Add(new RowStyle());
+            tableLayoutPanel7.RowCount = 3;
             tableLayoutPanel7.RowStyles.Add(new RowStyle());
             tableLayoutPanel7.RowStyles.Add(new RowStyle());
             tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel7.Size = new Size(336, 570);
             tableLayoutPanel7.TabIndex = 0;
             // 
@@ -1139,7 +1201,7 @@
             PixelDataGroupBox.Controls.Add(RGB565RadioButton);
             PixelDataGroupBox.Dock = DockStyle.Fill;
             PixelDataGroupBox.ForeColor = SystemColors.ControlText;
-            PixelDataGroupBox.Location = new Point(3, 289);
+            PixelDataGroupBox.Location = new Point(3, 3);
             PixelDataGroupBox.Name = "PixelDataGroupBox";
             PixelDataGroupBox.Size = new Size(330, 77);
             PixelDataGroupBox.TabIndex = 11;
@@ -1191,137 +1253,6 @@
             RGB565RadioButton.UseVisualStyleBackColor = true;
             RGB565RadioButton.CheckedChanged += RGB565RadioButton_CheckedChanged;
             // 
-            // FontFormatGroupBox
-            // 
-            FontFormatGroupBox.Controls.Add(IncludeCharInfoInImageCheckBox);
-            FontFormatGroupBox.Dock = DockStyle.Fill;
-            FontFormatGroupBox.Location = new Point(3, 233);
-            FontFormatGroupBox.Name = "FontFormatGroupBox";
-            FontFormatGroupBox.Size = new Size(330, 50);
-            FontFormatGroupBox.TabIndex = 10;
-            FontFormatGroupBox.TabStop = false;
-            FontFormatGroupBox.Text = "Font Format";
-            // 
-            // IncludeCharInfoInImageCheckBox
-            // 
-            IncludeCharInfoInImageCheckBox.AutoSize = true;
-            IncludeCharInfoInImageCheckBox.Location = new Point(32, 22);
-            IncludeCharInfoInImageCheckBox.Name = "IncludeCharInfoInImageCheckBox";
-            IncludeCharInfoInImageCheckBox.Size = new Size(228, 19);
-            IncludeCharInfoInImageCheckBox.TabIndex = 0;
-            IncludeCharInfoInImageCheckBox.Text = "Include Character Info in Pixel data file";
-            IncludeCharInfoInImageCheckBox.UseVisualStyleBackColor = true;
-            IncludeCharInfoInImageCheckBox.CheckedChanged += IncludeCharInfoInImageCheckBox_CheckedChanged;
-            // 
-            // FileFormatGroupBox
-            // 
-            FileFormatGroupBox.Controls.Add(CompressBasicImagePixeldataCheckBox);
-            FileFormatGroupBox.Controls.Add(CompressOptimizedPixelDataCheckBox);
-            FileFormatGroupBox.Controls.Add(CreatePixelDataFileCheckBox);
-            FileFormatGroupBox.Controls.Add(OptimizedImageRadioButton);
-            FileFormatGroupBox.Controls.Add(IncludeFileInfoInImageCheckbox);
-            FileFormatGroupBox.Controls.Add(SingleFileRadioButton);
-            FileFormatGroupBox.Controls.Add(IncludeWidthAndHeightCheckbox);
-            FileFormatGroupBox.Controls.Add(ImageFileRadioButton);
-            FileFormatGroupBox.Dock = DockStyle.Fill;
-            FileFormatGroupBox.Location = new Point(3, 3);
-            FileFormatGroupBox.Name = "FileFormatGroupBox";
-            FileFormatGroupBox.Size = new Size(330, 224);
-            FileFormatGroupBox.TabIndex = 8;
-            FileFormatGroupBox.TabStop = false;
-            FileFormatGroupBox.Text = "File Format";
-            // 
-            // CompressBasicImagePixeldataCheckBox
-            // 
-            CompressBasicImagePixeldataCheckBox.AutoSize = true;
-            CompressBasicImagePixeldataCheckBox.Location = new Point(33, 59);
-            CompressBasicImagePixeldataCheckBox.Name = "CompressBasicImagePixeldataCheckBox";
-            CompressBasicImagePixeldataCheckBox.Size = new Size(129, 19);
-            CompressBasicImagePixeldataCheckBox.TabIndex = 14;
-            CompressBasicImagePixeldataCheckBox.Text = "Compress Pixeldata";
-            CompressBasicImagePixeldataCheckBox.UseVisualStyleBackColor = true;
-            CompressBasicImagePixeldataCheckBox.CheckedChanged += CompressBasicImagePixeldataCheckBox_CheckedChanged;
-            // 
-            // CompressOptimizedPixelDataCheckBox
-            // 
-            CompressOptimizedPixelDataCheckBox.AutoSize = true;
-            CompressOptimizedPixelDataCheckBox.Location = new Point(33, 127);
-            CompressOptimizedPixelDataCheckBox.Name = "CompressOptimizedPixelDataCheckBox";
-            CompressOptimizedPixelDataCheckBox.Size = new Size(129, 19);
-            CompressOptimizedPixelDataCheckBox.TabIndex = 13;
-            CompressOptimizedPixelDataCheckBox.Text = "Compress Pixeldata";
-            CompressOptimizedPixelDataCheckBox.UseVisualStyleBackColor = true;
-            CompressOptimizedPixelDataCheckBox.CheckedChanged += CompressOptimizedPixelDataCheckBox_CheckedChanged;
-            // 
-            // CreatePixelDataFileCheckBox
-            // 
-            CreatePixelDataFileCheckBox.AutoSize = true;
-            CreatePixelDataFileCheckBox.Location = new Point(33, 108);
-            CreatePixelDataFileCheckBox.Name = "CreatePixelDataFileCheckBox";
-            CreatePixelDataFileCheckBox.Size = new Size(129, 19);
-            CreatePixelDataFileCheckBox.TabIndex = 11;
-            CreatePixelDataFileCheckBox.Text = "Create Pixeldata file";
-            CreatePixelDataFileCheckBox.UseVisualStyleBackColor = true;
-            CreatePixelDataFileCheckBox.CheckedChanged += CreatePixelDataFileCheckBox_CheckedChanged;
-            // 
-            // OptimizedImageRadioButton
-            // 
-            OptimizedImageRadioButton.AutoSize = true;
-            OptimizedImageRadioButton.Location = new Point(11, 88);
-            OptimizedImageRadioButton.Name = "OptimizedImageRadioButton";
-            OptimizedImageRadioButton.Size = new Size(116, 19);
-            OptimizedImageRadioButton.TabIndex = 10;
-            OptimizedImageRadioButton.TabStop = true;
-            OptimizedImageRadioButton.Text = "Optimized Image";
-            OptimizedImageRadioButton.UseVisualStyleBackColor = true;
-            OptimizedImageRadioButton.CheckedChanged += OptimizedImageRadioButton_CheckedChanged;
-            // 
-            // IncludeFileInfoInImageCheckbox
-            // 
-            IncludeFileInfoInImageCheckbox.AutoSize = true;
-            IncludeFileInfoInImageCheckbox.Location = new Point(33, 40);
-            IncludeFileInfoInImageCheckbox.Name = "IncludeFileInfoInImageCheckbox";
-            IncludeFileInfoInImageCheckbox.Size = new Size(195, 19);
-            IncludeFileInfoInImageCheckbox.TabIndex = 9;
-            IncludeFileInfoInImageCheckbox.Text = "Include File Info in Pixel data file";
-            IncludeFileInfoInImageCheckbox.UseVisualStyleBackColor = true;
-            IncludeFileInfoInImageCheckbox.CheckedChanged += IncludeFileInfoInImageCheckbox_CheckedChanged;
-            // 
-            // SingleFileRadioButton
-            // 
-            SingleFileRadioButton.AutoSize = true;
-            SingleFileRadioButton.Checked = true;
-            SingleFileRadioButton.Location = new Point(11, 154);
-            SingleFileRadioButton.Name = "SingleFileRadioButton";
-            SingleFileRadioButton.Size = new Size(78, 19);
-            SingleFileRadioButton.TabIndex = 6;
-            SingleFileRadioButton.TabStop = true;
-            SingleFileRadioButton.Text = "Single File";
-            SingleFileRadioButton.UseVisualStyleBackColor = true;
-            SingleFileRadioButton.CheckedChanged += SingleFileRadioButton_CheckedChanged;
-            // 
-            // IncludeWidthAndHeightCheckbox
-            // 
-            IncludeWidthAndHeightCheckbox.AutoSize = true;
-            IncludeWidthAndHeightCheckbox.Location = new Point(33, 175);
-            IncludeWidthAndHeightCheckbox.Name = "IncludeWidthAndHeightCheckbox";
-            IncludeWidthAndHeightCheckbox.Size = new Size(162, 19);
-            IncludeWidthAndHeightCheckbox.TabIndex = 8;
-            IncludeWidthAndHeightCheckbox.Text = "Include Width and Height";
-            IncludeWidthAndHeightCheckbox.UseVisualStyleBackColor = true;
-            IncludeWidthAndHeightCheckbox.CheckedChanged += IncludeWidthAndHeightCheckbox_CheckedChanged;
-            // 
-            // ImageFileRadioButton
-            // 
-            ImageFileRadioButton.AutoSize = true;
-            ImageFileRadioButton.Location = new Point(11, 22);
-            ImageFileRadioButton.Name = "ImageFileRadioButton";
-            ImageFileRadioButton.Size = new Size(79, 19);
-            ImageFileRadioButton.TabIndex = 7;
-            ImageFileRadioButton.Text = "Image File";
-            ImageFileRadioButton.UseVisualStyleBackColor = true;
-            ImageFileRadioButton.CheckedChanged += ImageFileRadioButton_CheckedChanged;
-            // 
             // groupBox3
             // 
             groupBox3.Controls.Add(SourceCopyToFolderLabel);
@@ -1339,7 +1270,7 @@
             groupBox3.Controls.Add(pixelDataTextBox);
             groupBox3.Controls.Add(label14);
             groupBox3.Dock = DockStyle.Fill;
-            groupBox3.Location = new Point(3, 372);
+            groupBox3.Location = new Point(3, 86);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new Size(330, 200);
             groupBox3.TabIndex = 12;
@@ -1520,6 +1451,11 @@
             panel6.Size = new Size(1334, 20);
             panel6.TabIndex = 1;
             // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(61, 4);
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1556,6 +1492,7 @@
             tableLayoutPanel5.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
             panel9.ResumeLayout(false);
+            groupBox8.ResumeLayout(false);
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
             ImageTab.ResumeLayout(false);
@@ -1576,10 +1513,6 @@
             tableLayoutPanel7.ResumeLayout(false);
             PixelDataGroupBox.ResumeLayout(false);
             PixelDataGroupBox.PerformLayout();
-            FontFormatGroupBox.ResumeLayout(false);
-            FontFormatGroupBox.PerformLayout();
-            FileFormatGroupBox.ResumeLayout(false);
-            FileFormatGroupBox.PerformLayout();
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)VersionRevisionInput).EndInit();
@@ -1616,13 +1549,6 @@
         private CheckBox SwapBytesCheckBox;
         private RadioButton RGB24RadioButton;
         private RadioButton RGB565RadioButton;
-        private GroupBox FontFormatGroupBox;
-        private CheckBox IncludeCharInfoInImageCheckBox;
-        private GroupBox FileFormatGroupBox;
-        private CheckBox IncludeFileInfoInImageCheckbox;
-        private RadioButton SingleFileRadioButton;
-        private CheckBox IncludeWidthAndHeightCheckbox;
-        private RadioButton ImageFileRadioButton;
         private GroupBox groupBox3;
         private NumericUpDown VersionRevisionInput;
         private NumericUpDown VersionPatchInput;
@@ -1651,7 +1577,7 @@
         private GroupBox InputTextFileGroupBox;
         private GroupBox TextInfoGroupBox;
         private TableLayoutPanel tableLayoutPanel2;
-        private ListView TextToConvertListView;
+        private ListView textToConvertListView;
         private ColumnHeader keyCH;
         private TableLayoutPanel tableLayoutPanel3;
         private Button AddTextStyleButton;
@@ -1684,7 +1610,7 @@
         private TableLayoutPanel tableLayoutPanel4;
         private Button AddTextInstructionBtn;
         private Button DeleteTextInstructionBtn;
-        private ListView TextInstructionListView;
+        private ListView textInstructionListView;
         private ColumnHeader columnHeader3;
         private ToolStripMenuItem fontStylesToolStripMenuItem;
         private ColumnHeader columnHeader1;
@@ -1721,10 +1647,14 @@
         private RadioButton FontKeyFontnameRB;
         private RadioButton FontKeyProjectFnRB;
         private GroupBox groupBox5;
-        private RadioButton OptimizedImageRadioButton;
-        private CheckBox CreatePixelDataFileCheckBox;
-        private CheckBox CompressOptimizedPixelDataCheckBox;
         private ToolTip toolTipMainForm;
-        private CheckBox CompressBasicImagePixeldataCheckBox;
+        private ToolStripMenuItem dataLocationToolStripMenuItem;
+        private GroupBox groupBox8;
+        private ComboBox fontDataLocationComboBox;
+        private ContextMenuStrip contextMenuStrip1;
+        private Label label2;
+        private ComboBox textDataLocationComboBox;
+        private Button selectDataLocationButton;
+        private ColumnHeader columnHeader5;
     }
 }

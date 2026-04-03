@@ -6,7 +6,8 @@ using IRL_Common_Library.Consts;
 using IRL_Common_Library.Utils;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
 using IRL_Gui_Image_Builder_Library.Exceptions;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 using IRL_Gui_Image_Builder_Library.Projects;
 using IRL_Image_Creator.Projects;
 using System.Diagnostics;
@@ -18,8 +19,8 @@ namespace IRL_Image_Creator.Windows.Helpers
         public static void CreateBitmaps(Project project, ConverterStatusUpdater converterStatusUpdater, Form owner)
         {
             owner.Enabled = false;
-            BuildFolders.ClearLogFolder(project.ProjectFolder);
-            Log.OpenNewFile(BuildFolders.LogFolderPath(project.ProjectFolder));
+            BuildFolders.ClearLogFolder();
+            Log.OpenNewFile(FileConstants.GetLogFolder(), project.ImageBuilderSettings.LogVerbose);
 
             bool success = StartCreateBitmaps(project, converterStatusUpdater);
 
@@ -35,7 +36,7 @@ namespace IRL_Image_Creator.Windows.Helpers
 
                 // Open File explorer
                 //
-                string buildFolder = $"{project.ProjectFolder}{FileConstants.LogFolder}";
+                string buildFolder = FileConstants.GetLogFolder();
                 Process.Start("explorer.exe", @buildFolder);
             }
         }
@@ -44,8 +45,8 @@ namespace IRL_Image_Creator.Windows.Helpers
             Project project, BindingSource imageBuilderSettingsBindingSource, BuilderStatusUpdater statusUpdater, Form owner)
         {
             owner.Enabled = false;
-            BuildFolders.ClearLogFolder(project.ProjectFolder);
-            Log.OpenNewFile(BuildFolders.LogFolderPath(project.ProjectFolder));
+            BuildFolders.ClearLogFolder();
+            Log.OpenNewFile(FileConstants.GetLogFolder(), project.ImageBuilderSettings.LogVerbose);
 
             StartCreateImage(project, imageBuilderSettingsBindingSource, statusUpdater, owner);
 
@@ -57,39 +58,32 @@ namespace IRL_Image_Creator.Windows.Helpers
             Project project, BindingSource imageBuilderSettingsBindingSource, 
             ConverterStatusUpdater converterStatusUpdater, BuilderStatusUpdater statusUpdater, Form owner)
         {
-            if (project.ImageBuilderSettings.FileSystemFormat.FileFormat == FileFormat.SingleFile)
+            owner.Enabled = false;
+            BuildFolders.ClearLogFolder();
+            Log.OpenNewFile(FileConstants.GetLogFolder(), project.ImageBuilderSettings.LogVerbose);
+
+            bool bitmapsCreated = StartCreateBitmaps(project, converterStatusUpdater);
+
+            if (bitmapsCreated)
             {
                 StartCreateImage(project, imageBuilderSettingsBindingSource, statusUpdater, owner);
             }
-            else
+
+            Log.CloseFile();
+            owner.Enabled = true;
+
+            if (!bitmapsCreated)
             {
-                owner.Enabled = false;
-                BuildFolders.ClearLogFolder(project.ProjectFolder);
-                Log.OpenNewFile(BuildFolders.LogFolderPath(project.ProjectFolder));
+                const string caption = "Result";
+                MessageBox.Show(owner, "Error creating bitmaps", caption,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
 
-                bool bitmapsCreated = StartCreateBitmaps(project, converterStatusUpdater);
-
-                if (bitmapsCreated)
-                {
-                    StartCreateImage(project, imageBuilderSettingsBindingSource, statusUpdater, owner);
-                }
-
-                Log.CloseFile();
-                owner.Enabled = true;
-
-                if (!bitmapsCreated)
-                {
-                    const string caption = "Result";
-                    MessageBox.Show(owner, "Error creating bitmaps", caption,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-
-                    // Open File explorer
-                    //
-                    string buildFolder = $"{project.ProjectFolder}{FileConstants.LogFolder}";
-                    Process.Start("explorer.exe", @buildFolder);
-                }
-            }
+                // Open File explorer
+                //
+                string buildFolder = FileConstants.GetLogFolder();
+                Process.Start("explorer.exe", @buildFolder);
+            }   
         }
 
         private static void StartCreateImage(Project project, BindingSource imageBuilderSettingsBindingSource, BuilderStatusUpdater statusUpdater, Form owner)
@@ -118,14 +112,13 @@ namespace IRL_Image_Creator.Windows.Helpers
             try
             {
                 message = ImageBuilder.StartConvertingBmps(
-                    project.ImageBuilderSettings, fsColors, statusUpdater,
-                    project.ProjectFolder, project.UserSourceFolder);
-                folderToOpen = $"{project.ProjectFolder}{FileConstants.BuildFolder}";
+                    project.ImageBuilderSettings, fsColors, statusUpdater, project.UserSourceFolder);
+                folderToOpen = FileConstants.GetBuildFolder();
             }
             catch (ImageBuilderException e)
             {
                 message = "Error creating image files. Check the log file for details. " + e.Message;
-                folderToOpen = $"{project.ProjectFolder}{FileConstants.LogFolder}";
+                folderToOpen = FileConstants.GetLogFolder();
             }
 
             // Update version
@@ -162,11 +155,9 @@ namespace IRL_Image_Creator.Windows.Helpers
                 }
             }
 
-            bool bitmapMaskOnly = project.ImageBuilderSettings.FileSystemFormat.FileFormat == FileFormat.OptimizedImage;
-            
             return MainConverter.CreateBitmaps(
                 project.Instructions, project.Fonts, project.TextStyles, project.FontBitmapStyles, project.IconStyles,
-                bitmapMaskOnly, numberOfTranslations, project.ProjectFolder, converterStatusUpdater);
+                project.ImageBuilderSettings.DataLocations, numberOfTranslations, converterStatusUpdater);
         }
 
         private static List<FSColor> GetFSColors(List<ConverterColor> colors)

@@ -2,7 +2,7 @@
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 using System.Xml.Serialization;
 
 namespace IRL_Image_Creator.Windows.ProjectSettings

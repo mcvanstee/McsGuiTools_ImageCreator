@@ -1,23 +1,22 @@
 ﻿using IRL_Common_Library.Consts;
 using IRL_Gui_Image_Builder_Library.CodeGeneration.Utils;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystemModels.Fonts;
-using IRL_Gui_Image_Builder_Library.Projects;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Fonts;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration.FontSearchFiles
 {
     public static class FontNumbersOnlyCFile
     {
-        public static void CreateFontNumbersOnlyCharInfoSearchCFile(string projectPath, FontBuilder fontBuilder, FileFormat fileFormat)
+        public static void CreateFontNumbersOnlyCharInfoSearchCFile(FontBuilder fontBuilder)
         {
-            StreamWriter sw = new(BuildFolders.SourceFolderPath(projectPath) + "\\" + FileConstants.CharInfoSearchFile + ".c");
+            string filePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.CHAR_INFO_SEARCH_FILE + ".c");
+            StreamWriter sw = new(filePath);
             int digitOnlyFontCount = fontBuilder.Fonts.FindAll(f => f.IsNumberOnly).Count;
             int fullFontsCount = fontBuilder.Fonts.Count - digitOnlyFontCount;
             int noOfFonts = fontBuilder.Fonts.Count;
             const int noOfChars = 95;
             const int noOfDigitOnlyChars = 12;
 
-            CodeGenegrationUtils.Include(sw, FileConstants.CharInfoSearchFile);
+            CodeGenegrationUtils.Include(sw, FileConstants.CHAR_INFO_SEARCH_FILE);
             CodeGenegrationUtils.BlankLine(sw);
             AddCharInfoArray(sw, fontBuilder, noOfFonts, fullFontsCount, noOfChars);
             CodeGenegrationUtils.BlankLine(sw);
@@ -191,7 +190,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.FontSearchFiles
         private static void AddGetCharInfoFunction(StreamWriter sw, FontBuilder fontBuilder, int noOfFonts)
         {
             sw.WriteLine("");
-            sw.WriteLine("bool fs_getCharInfo(const char c, const font_key_e font_key, fs_char_info_s *p_out_char_info)");
+            sw.WriteLine("bool fs_getCharInfo(const char c, const font_key_e font_key, fs_char_info_s *p_out_char_info, uint8_t *p_dataLocation)");
             sw.WriteLine("{");
             sw.WriteLine("    bool charInfoFound = false;");
             sw.WriteLine("    const int32_t charIndex = fs_getCharIndex(font_key, c);");
@@ -213,6 +212,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.FontSearchFiles
                 "            {\n" +
                 "                *p_out_char_info = fs_char_info[fontIndex][charIndex];\n" +
                 "                charInfoFound = true;\n" +
+                "                *p_dataLocation = FS_FONT_DATA_LOCATION;\n" +
                 "            }\n" +
                 "            break;\n" +
                 "        }");
@@ -226,10 +226,11 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.FontSearchFiles
             }
             sw.WriteLine(
                 "        {\n" +
-                "            if ((FS_CHAR_INFOS_IN_DIGIT_ONLY_FONT > charIndex) && (FS_FONTS > fontIndex) && (charIndex >= 0) && (fontIndex >= 0))\n" +
+                "            if ((FS_CHAR_INFOS_IN_DIGIT_ONLY_FONT > charIndex) && (FS_CHAR_INFOS_IN_DIGIT_ONLY_FONT > fontIndex) && (charIndex >= 0) && (fontIndex >= 0))\n" +
                 "            {\n" +
                 "                *p_out_char_info = fs_char_info_digits[fontIndex][charIndex];\n" +
                 "                charInfoFound = true;\n" +
+                "                *p_dataLocation = FS_FONT_DATA_LOCATION;\n" +
                 "            }\n" +
                 "            break;\n" +
                 "        }");

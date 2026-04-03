@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IRL_Common_Library\IRL_Common_Library.csproj" />
+    <ProjectReference Include="..\IRL_Gui_Image_Builder_Library\IRL_Gui_Image_Builder_Library.csproj" />
   </ItemGroup>
 
 </Project>

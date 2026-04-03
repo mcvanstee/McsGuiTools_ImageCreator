@@ -1,22 +1,26 @@
-﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using IRL_Image_Creator.Projects;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions;
+using IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions;
+using IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions;
+using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
 using IRL_Bitmap_Converter_Tools.StatusUpdater;
 using IRL_Common_Library.Consts;
 using IRL_Common_Library.Utils;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
+using IRL_Image_Creator.Projects;
+using IRL_Image_Creator.Windows.ColorForms;
+using IRL_Image_Creator.Windows.DataLocationForms;
 using IRL_Image_Creator.Windows.FilePropertyForms;
-using IRL_Image_Creator.Windows.TextStyleForms;
-using IRL_Image_Creator.Windows.Helpers;
+using IRL_Image_Creator.Windows.FontForms;
 using IRL_Image_Creator.Windows.FontStyleForms;
+using IRL_Image_Creator.Windows.Helpers;
 using IRL_Image_Creator.Windows.IconStyleForms;
 using IRL_Image_Creator.Windows.ProjectSettings;
-using IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions;
+using IRL_Image_Creator.Windows.TextStyleForms;
 using Svg;
-using IRL_Image_Creator.Windows.ColorForms;
-using IRL_Bitmap_Converter_Tools.ConverterInstructions;
-using IRL_Image_Creator.Windows.FontForms;
-using IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace IRL_Image_Creator.Windows
 {
@@ -29,7 +33,8 @@ namespace IRL_Image_Creator.Windows
         private readonly BuilderStatusUpdater m_statusUpdater = new();
         private readonly ConverterStatusUpdater m_converterStatusUpdater = new();
         private readonly BindingSource m_imageBuilderSettingsBindingSource = new();
-        private Dictionary<string, string> m_iconStyleComboBoxDictionary = new();
+        private Dictionary<string, string> m_iconStyleComboBoxDictionary = [];
+        private Dictionary<string, string> m_dataLocationComboBoxDictionary = [];
 
         private int m_selectedTextInstructionIndex = -1;
 
@@ -45,11 +50,6 @@ namespace IRL_Image_Creator.Windows
 
         private void AddToolTips()
         {
-            toolTipMainForm.SetToolTip(ImageFileRadioButton, AppToolTips.MainWindow_ImageFileRadioButton);
-            toolTipMainForm.SetToolTip(IncludeFileInfoInImageCheckbox, AppToolTips.MainWindow_IncludeFileInfoInImageCheckbox);
-            toolTipMainForm.SetToolTip(SingleFileRadioButton, AppToolTips.MainWindow_SingleFileRadioButton);
-            toolTipMainForm.SetToolTip(OptimizedImageRadioButton, AppToolTips.MainWindow_CompressedImageRadioButton);
-
             toolTipMainForm.SetToolTip(SelectUserFolderButton, AppToolTips.MainWindow_SelectUserFolderButton);
         }
 
@@ -89,8 +89,6 @@ namespace IRL_Image_Creator.Windows
         protected override void OnClosing(CancelEventArgs e)
         {
             Project.Save(m_project);
-
-            base.OnClosing(e);
         }
 
         private void OnUpdateBuilderStatus(object sender, BuilderEventArgs e)
@@ -130,7 +128,7 @@ namespace IRL_Image_Creator.Windows
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FileDialog.Filter = $"GI project files | *{FileConstants.ProjectFileExtension}";
+            FileDialog.Filter = $"GI project files | *{FileConstants.PROJECT_FILE_EXTENSION}";
             FileDialog.Multiselect = false;
             DialogResult result = FileDialog.ShowDialog(this);
 
@@ -147,7 +145,7 @@ namespace IRL_Image_Creator.Windows
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(m_project.Name) || string.IsNullOrEmpty(m_project.ProjectFolder))
+            if (string.IsNullOrEmpty(m_project.Name))
             {
                 Debug.WriteLine("Save as");
                 // TODO save as
@@ -171,6 +169,17 @@ namespace IRL_Image_Creator.Windows
             AboutForm aboutForm = new();
             aboutForm.StartPosition = FormStartPosition.CenterParent;
             aboutForm.ShowDialog(this);
+        }
+
+        private void dataLocationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DataLocationForm dataLocationForm = new(m_project);
+            dataLocationForm.StartPosition = FormStartPosition.CenterParent;
+            dataLocationForm.ShowDialog(this);
+
+            UpdateDataLocationDictionary();
+            SetFontDataLocationComboBoxValues();
+            SetTextDataLocationComboBoxValues();
         }
 
         private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,15 +256,9 @@ namespace IRL_Image_Creator.Windows
 
         private void UpdateProjectChanged()
         {
-            FileSystemFormat fsFormat = m_project.ImageBuilderSettings.FileSystemFormat;
-            IncludeFileInfoInImageCheckbox.Checked = !fsFormat.SeparateSearchTreeFromData;
-            CompressBasicImagePixeldataCheckBox.Checked = fsFormat.CompressBasicImagePixelData;
-            IncludeWidthAndHeightCheckbox.Checked = fsFormat.SingleFileIncludeWidthHeight;
-            IncludeCharInfoInImageCheckBox.Checked = m_project.ImageBuilderSettings.FontDataInImage;
-            CreatePixelDataFileCheckBox.Checked = fsFormat.CreatePixelDataFile;
-            CompressOptimizedPixelDataCheckBox.Checked = fsFormat.CompressOptimizedPixelData;
-
-            SelectFileFormat(m_project.ImageBuilderSettings.FileSystemFormat.FileFormat);
+            UpdateDataLocationDictionary();
+            SetFontDataLocationComboBoxValues();
+            SetTextDataLocationComboBoxValues();
 
             if (m_project.ImageBuilderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB565)
             {
@@ -282,9 +285,9 @@ namespace IRL_Image_Creator.Windows
             m_imageBuilderSettingsBindingSource.ResetBindings(false);
             m_selectedTextInstructionIndex = -1;
 
-            TextInstructionHelper.InitTextInstructionForm(TextInstructionListView);
-            TextInstructionHelper.RefreshTextInstructionList(TextInstructionListView, m_project);
-            TextInstructionHelper.ListViewSelectFirst(TextInstructionListView);
+            TextInstructionHelper.InitTextInstructionForm(textInstructionListView);
+            TextInstructionHelper.RefreshTextInstructionList(textInstructionListView, m_project);
+            TextInstructionHelper.ListViewSelectFirst(textInstructionListView, ref m_selectedTextInstructionIndex);
 
             SetFontKeyRadioButtons();
             SetIconStyleComboBoxValues();
@@ -292,6 +295,7 @@ namespace IRL_Image_Creator.Windows
             panel1.Enabled = true;
             projectToolStripMenuItem.Enabled = true;
 
+            FontInstructionHelper.UpdateFontDataLocationComboBoxValue(m_project, fontDataLocationComboBox);
             FontInstructionHelper.RefreshFontListView(m_project, FontsListView);
             FontsListViewSetButtons();
 
@@ -299,208 +303,17 @@ namespace IRL_Image_Creator.Windows
             IconListViewSetButtons();
 
             TextInstructionListViewSetStateButtons();
-        }
 
-
-        // ## Icon instructions ##
-        //
-
-        private void AddIconButton_Click(object sender, EventArgs e)
-        {
-            IconInstructionHelper.AddImages(m_project, FileDialog, IconListView, this);
-        }
-
-        private void DeleteIconButton_Click(object sender, EventArgs e)
-        {
-            IconInstructionHelper.DeleteImages(m_project, IconListView, this);
-        }
-
-        private void EditIconNameButton_Click(object sender, EventArgs e)
-        {
-            EditIconNameForm editIconNameForm = new((SvgFileInfo)IconListView.SelectedItems[0].Tag);
-            editIconNameForm.StartPosition = FormStartPosition.CenterParent;
-            DialogResult result = editIconNameForm.ShowDialog(this);
-
-            if (result == DialogResult.OK)
+            if (Debugger.IsAttached)
             {
-                Project.Save(m_project);
-                IconInstructionHelper.RefreshImageListView(m_project, IconListView);
+                m_project.ImageBuilderSettings.LogVerbose = true;
             }
         }
 
-        private void SelectIconStyleButton_Click(object sender, EventArgs e)
-        {
-            IconInstructionHelper.AddIconStyle(m_project, IconListView, this);
-        }
-
-        private void SetIconStyleComboBoxValues()
-        {
-            m_iconStyleComboBoxDictionary.Clear();
-            m_iconStyleComboBoxDictionary.Add("0", "None");
-
-            foreach (IconStyle iconStyle in m_project.IconStyles)
-            {
-                m_iconStyleComboBoxDictionary.Add((iconStyle.ID + 1).ToString(), iconStyle.Name);
-            }
-
-            IconStyleComboBox.DataSource = new BindingSource(m_iconStyleComboBoxDictionary, null);
-            IconStyleComboBox.DisplayMember = "Value";
-            IconStyleComboBox.ValueMember = "Key";
-        }
-
-        private void IconStyleComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SetIconStyleToSvgPreview();
-        }
-
-        private void SetIconStyleToSvgPreview()
-        {
-            string key = ((KeyValuePair<string, string>)IconStyleComboBox.SelectedItem).Key;
-            if (key == "0")
-            {
-                return;
-            }
-
-            try
-            {
-                int iconStyleId = int.Parse(key) - 1;
-                IconStyle iconStyle = IconStyle.GetImageStyleById(iconStyleId, m_project.IconStyles);
-
-                IconInstructionHelper.ApplyImageStyeToSvG(iconStyle, IconListView, svgViewer, svgXMLViewer);
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception);
-            }
-        }
-
-        private void IconListViewSetButtons()
-        {
-            if (IconListView.SelectedItems.Count > 0)
-            {
-                DeleteImagesButton.Enabled = true;
-                EditIconNameButton.Enabled = true;
-                SelectIconStyleButton.Enabled = true;
-            }
-            else
-            {
-                SelectIconStyleButton.Enabled = false;
-                EditIconNameButton.Enabled = false;
-                DeleteImagesButton.Enabled = false;
-            }
-        }
-
-        private void IconListView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            IconListViewSetButtons();
-
-            ListView.SelectedIndexCollection indices = IconListView.SelectedIndices;
-
-            if (indices.Count == 0)
-            {
-                return;
-            }
-
-            try
-            {
-                SvgFileInfo svgFileInfo = (SvgFileInfo)IconListView.SelectedItems[0].Tag;
-
-                SvgDocument svgDocument = SvgDocument.FromSvg<SvgDocument>(svgFileInfo.SvgString);
-                IconInstructionHelper.RenderSvg(svgDocument, svgViewer);
-                svgXMLViewer.Text = svgFileInfo.SvgString;
-
-                SetIconStyleToSvgPreview();
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                throw;
-            }
-        }
 
 
         // ## Bitmap and Image builder ##
         //
-
-        private void ImageFileRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (ImageFileRadioButton.Checked)
-            {
-                SelectFileFormat(FileFormat.BasicImage);
-            }
-        }
-
-        private void OptimizedImageRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (OptimizedImageRadioButton.Checked)
-            {
-                SelectFileFormat(FileFormat.OptimizedImage);
-            }
-        }
-
-        private void SingleFileRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (SingleFileRadioButton.Checked)
-            {
-                SelectFileFormat(FileFormat.SingleFile);
-            }
-        }
-
-        private void SelectFileFormat(FileFormat fileformat)
-        {
-            switch (fileformat)
-            {
-                case FileFormat.BasicImage:
-                    ImageFileRadioButton.Checked = true;
-                    SingleFileRadioButton.Checked = false;
-                    OptimizedImageRadioButton.Checked = false;
-                    break;
-                case FileFormat.SingleFile:
-                    ImageFileRadioButton.Checked = false;
-                    SingleFileRadioButton.Checked = true;
-                    OptimizedImageRadioButton.Checked = false;
-                    break;
-                case FileFormat.OptimizedImage:
-                    ImageFileRadioButton.Checked = false;
-                    SingleFileRadioButton.Checked = false;
-                    OptimizedImageRadioButton.Checked = true;
-                    break;
-                default:
-                    break;
-            }
-
-            m_project.ImageBuilderSettings.FileSystemFormat.FileFormat = fileformat;
-        }
-
-        private void IncludeFileInfoInImageCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FileSystemFormat.SeparateSearchTreeFromData = !IncludeFileInfoInImageCheckbox.Checked;
-        }
-
-        private void CompressBasicImagePixeldataCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FileSystemFormat.CompressBasicImagePixelData = CompressBasicImagePixeldataCheckBox.Checked;
-        }
-
-        private void IncludeWidthAndHeightCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FileSystemFormat.SingleFileIncludeWidthHeight = IncludeWidthAndHeightCheckbox.Checked;
-        }
-
-        private void IncludeCharInfoInImageCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FontDataInImage = IncludeCharInfoInImageCheckBox.Checked;
-        }
-
-        private void CreatePixelDataFileCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FileSystemFormat.CreatePixelDataFile = CreatePixelDataFileCheckBox.Checked;
-        }
-
-        private void CompressOptimizedPixelDataCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            m_project.ImageBuilderSettings.FileSystemFormat.CompressOptimizedPixelData = CompressOptimizedPixelDataCheckBox.Checked;
-        }
 
         private void RGB565RadioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -588,35 +401,42 @@ namespace IRL_Image_Creator.Windows
 
         private void AddTextInstructionBtn_Click(object sender, EventArgs e)
         {
-            TextInstructionHelper.AddTextInstruction(m_project, TextInstructionListView, this);
+            TextInstructionHelper.AddTextInstruction(m_project, textInstructionListView, this);
         }
 
         private void DeleteTextInstructionBtn_Click(object sender, EventArgs e)
         {
-            TextInstructionHelper.DeleteTextInstructionk(m_project, TextInstructionListView);
+            TextInstructionHelper.DeleteTextInstruction(m_project, textInstructionListView);
         }
 
         private void ImportTextBtn_Click(object sender, EventArgs e)
         {
-            TextInstructionHelper.ImportText(m_project, TextInstructionListView, TextToConvertListView, this);
+            TextInstructionHelper.ImportText(m_project, textInstructionListView, textToConvertListView, this);
         }
 
         private void AddTextStyleButton_Click(object sender, EventArgs e)
         {
-            TextInstructionHelper.AddTextStyle(m_project, TextInstructionListView, TextToConvertListView, this);
+            TextInstructionHelper.AddTextStyle(m_project, textInstructionListView, textToConvertListView, this);
         }
 
         private void DeleteTextStyleButton_Click(object sender, EventArgs e)
         {
-            TextInstructionHelper.DeleteTextStyle(m_project, TextInstructionListView, TextToConvertListView, this);
+            TextInstructionHelper.DeleteTextStyle(m_project, textInstructionListView, textToConvertListView, this);
         }
 
         private void TextInstructionListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
+
+        }
+
+        private void TextInstructionListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Text instruction selection changed");
             TextInstructionHelper.TextInstructionListViewSelectionChanged(
-                ref m_selectedTextInstructionIndex, m_project, TextInstructionListView, TextToConvertListView, InputTextFileGroupBox);
+                ref m_selectedTextInstructionIndex, m_project, textInstructionListView, textToConvertListView, InputTextFileGroupBox);
             TextInstructionListViewSetStateButtons();
             TextToConvertListViewSetStateButtons();
+            UpdateTextDataLocationComboBoxValue();
         }
 
         private void TextToConvertListView_SelectedIndexChanged(object sender, EventArgs e)
@@ -624,9 +444,79 @@ namespace IRL_Image_Creator.Windows
             TextToConvertListViewSetStateButtons();
         }
 
+        private void TextDataLocationComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (textInstructionListView.Items.Count == 0 || m_selectedTextInstructionIndex == -1) 
+            {
+                return;
+            }
+
+            ListViewItem selectedItem = textInstructionListView.Items[m_selectedTextInstructionIndex];
+            TextInstruction textInstruction = (TextInstruction)m_project.Instructions.Find(x => x.Name == selectedItem.Text);
+
+            if (textInstruction == null)
+            {
+                return;
+            }
+
+            try
+            {
+                int value = int.Parse(textDataLocationComboBox.SelectedValue.ToString());
+                textInstruction.DataLocationId = value;
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception);
+
+                return;
+            }
+        }
+
+        private void UpdateTextDataLocationComboBoxValue()
+        {
+            ListViewItem selectedItem = textInstructionListView.Items[m_selectedTextInstructionIndex];
+            TextInstruction textInstruction = (TextInstruction)m_project.Instructions.Find(x => x.Name == selectedItem.Text);
+
+            if (textInstruction == null)
+            {
+                return;
+            }
+
+            textDataLocationComboBox.SelectedValue = textInstruction.DataLocationId.ToString();
+        }
+
+        private void textToConvertListView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
+        {
+            if (textInstructionListView.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            ListViewItem selectedItem = textInstructionListView.SelectedItems[0];
+            TextInstruction textInstruction = (TextInstruction)m_project.Instructions.Find(x => x.Name == selectedItem.Text);
+
+            if (textInstruction.Table.ColumnWidths.Count != textInstruction.Table.NumberOfColumns + 1)
+            {
+                return;
+            }
+
+            if (textToConvertListView.Columns.Count != textInstruction.Table.ColumnWidths.Count)
+            {
+                return;
+            }
+
+            if ((textInstruction.Table.ColumnWidths[e.ColumnIndex] != textToConvertListView.Columns[e.ColumnIndex].Width) &&
+                (textToConvertListView.Columns[e.ColumnIndex].Width != 60))
+            {
+                Debug.WriteLine($"Column width changed: ColumnIndex={e.ColumnIndex}, NewWidth={textToConvertListView.Columns[e.ColumnIndex].Width}");
+                textInstruction.Table.ColumnWidths[e.ColumnIndex] = textToConvertListView.Columns[e.ColumnIndex].Width;
+                Project.Save(m_project);
+            }
+        }
+
         private void TextToConvertListViewSetStateButtons()
         {
-            if (TextToConvertListView.SelectedItems.Count > 0)
+            if (m_selectedTextInstructionIndex != -1)
             {
                 AddTextStyleButton.Enabled = true;
                 DeleteTextStyleButton.Enabled = true;
@@ -640,7 +530,7 @@ namespace IRL_Image_Creator.Windows
 
         private void TextInstructionListViewSetStateButtons()
         {
-            if (TextInstructionListView.SelectedItems.Count > 0)
+            if (m_selectedTextInstructionIndex != -1)
             {
                 DeleteTextInstructionBtn.Enabled = true;
                 TextInfoGroupBox.Enabled = true;
@@ -652,6 +542,13 @@ namespace IRL_Image_Creator.Windows
                 TextInfoGroupBox.Enabled = false;
                 InputTextFileGroupBox.Enabled = false;
             }
+        }
+
+        private void SetTextDataLocationComboBoxValues()
+        {
+            textDataLocationComboBox.DataSource = new BindingSource(m_dataLocationComboBoxDictionary, null);
+            textDataLocationComboBox.DisplayMember = "Value";
+            textDataLocationComboBox.ValueMember = "Key";
         }
 
 
@@ -754,6 +651,188 @@ namespace IRL_Image_Creator.Windows
             {
                 fontInstruction.FontFileKeyFormat = FontFileKeyFormat.Both;
             }
+        }
+
+        private void FontDataLocationComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            FontInstruction fontInstruction = FontInstructionHelper.GetFontInstruction(m_project.Instructions);
+
+            if (fontInstruction == null)
+            {
+                return;
+            }
+
+            try
+            {
+                int value = int.Parse(fontDataLocationComboBox.SelectedValue.ToString());
+                fontInstruction.DataLocationId = value;
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception);
+
+                return;
+            }
+        }
+
+        private void SetFontDataLocationComboBoxValues()
+        {
+            fontDataLocationComboBox.DataSource = new BindingSource(m_dataLocationComboBoxDictionary, null);
+            fontDataLocationComboBox.DisplayMember = "Value";
+            fontDataLocationComboBox.ValueMember = "Key";
+        }
+
+        // ## Icon instructions ##
+        //
+
+        private void AddIconButton_Click(object sender, EventArgs e)
+        {
+            IconInstructionHelper.AddImages(m_project, FileDialog, IconListView, this);
+        }
+
+        private void DeleteIconButton_Click(object sender, EventArgs e)
+        {
+            IconInstructionHelper.DeleteImages(m_project, IconListView, this);
+        }
+
+        private void EditIconNameButton_Click(object sender, EventArgs e)
+        {
+            EditIconNameForm editIconNameForm = new((SvgFileInfo)IconListView.SelectedItems[0].Tag);
+            editIconNameForm.StartPosition = FormStartPosition.CenterParent;
+            DialogResult result = editIconNameForm.ShowDialog(this);
+
+            if (result == DialogResult.OK)
+            {
+                Project.Save(m_project);
+                IconInstructionHelper.RefreshImageListView(m_project, IconListView);
+            }
+        }
+
+        private void SelectIconStyleButton_Click(object sender, EventArgs e)
+        {
+            IconInstructionHelper.AddIconStyle(m_project, IconListView, this);
+        }
+
+        private void SetIconStyleComboBoxValues()
+        {
+            m_iconStyleComboBoxDictionary.Clear();
+            m_iconStyleComboBoxDictionary.Add("0", "None");
+
+            foreach (IconStyle iconStyle in m_project.IconStyles)
+            {
+                m_iconStyleComboBoxDictionary.Add((iconStyle.ID + 1).ToString(), iconStyle.Name);
+            }
+
+            IconStyleComboBox.DataSource = new BindingSource(m_iconStyleComboBoxDictionary, null);
+            IconStyleComboBox.DisplayMember = "Value";
+            IconStyleComboBox.ValueMember = "Key";
+        }
+
+        private void IconStyleComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetIconStyleToSvgPreview();
+        }
+
+        private void SetIconStyleToSvgPreview()
+        {
+            string key = ((KeyValuePair<string, string>)IconStyleComboBox.SelectedItem).Key;
+            if (key == "0")
+            {
+                return;
+            }
+
+            try
+            {
+                int iconStyleId = int.Parse(key) - 1;
+                IconStyle iconStyle = IconStyle.GetImageStyleById(iconStyleId, m_project.IconStyles);
+
+                IconInstructionHelper.ApplyImageStyeToSvG(iconStyle, IconListView, svgViewer, svgXMLViewer);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception);
+            }
+        }
+
+        private void IconListViewSetButtons()
+        {
+            if (IconListView.SelectedItems.Count > 0)
+            {
+                DeleteImagesButton.Enabled = true;
+                EditIconNameButton.Enabled = true;
+                SelectIconStyleButton.Enabled = true;
+                selectDataLocationButton.Enabled = true;
+            }
+            else
+            {
+                SelectIconStyleButton.Enabled = false;
+                EditIconNameButton.Enabled = false;
+                DeleteImagesButton.Enabled = false;
+                selectDataLocationButton.Enabled = false;
+            }
+        }
+
+        private void IconListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            IconListViewSetButtons();
+
+            ListView.SelectedIndexCollection indices = IconListView.SelectedIndices;
+
+            if (indices.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                SvgFileInfo svgFileInfo = (SvgFileInfo)IconListView.SelectedItems[0].Tag;
+
+                SvgDocument svgDocument = SvgDocument.FromSvg<SvgDocument>(svgFileInfo.SvgString);
+                IconInstructionHelper.RenderSvg(svgDocument, svgViewer);
+                svgXMLViewer.Text = svgFileInfo.SvgString;
+
+                SetIconStyleToSvgPreview();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+        }
+
+        private void SelectDataLocationButton_Click(object sender, EventArgs e)
+        {
+            IconInstructionHelper.SelectIconDataLocation(m_project, IconListView, this);
+        }
+
+
+        // ## Form general methods ##
+        //
+        private void UpdateDataLocationDictionary()
+        {
+            m_dataLocationComboBoxDictionary.Clear();
+
+            foreach (DataLocation dataLocation in m_project.ImageBuilderSettings.DataLocations)
+            {
+                string locationName = "";
+                if (string.IsNullOrEmpty(dataLocation.Name))
+                {
+                    locationName = dataLocation.DataLocationType.ToString();
+                }
+                else
+                {
+                    locationName = dataLocation.Name;
+                }
+
+                m_dataLocationComboBoxDictionary.Add(
+                    dataLocation.LocationID.ToString(),
+                    $"{dataLocation.LocationID.ToString()} - {locationName}");
+            }
+        }
+
+        private void TextDataLocationComboBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Text data location combo box selected value changed");
         }
     }
 }

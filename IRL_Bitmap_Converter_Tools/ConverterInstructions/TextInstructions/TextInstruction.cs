@@ -7,5 +7,8 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions
     {
         [XmlElement]
         public TextTable Table { get; set; } = new();
+
+        [XmlElement]
+        public int DataLocationId { get; set; } = 0;
     }
 }

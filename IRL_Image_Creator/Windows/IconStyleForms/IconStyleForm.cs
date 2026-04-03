@@ -2,6 +2,7 @@
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions;
 using IRL_Common_Library.Utils;
 using IRL_Image_Creator.Projects;
+using IRL_Image_Creator.Windows.Helpers;
 
 namespace IRL_Image_Creator.Windows.IconStyleForms
 {
@@ -102,7 +103,7 @@ namespace IRL_Image_Creator.Windows.IconStyleForms
                 IconStyleListView.Items.Add(item);
             }
 
-            IconStyleListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            ListViewHelper.AutoResizeColumns(IconStyleListView);
         }
 
         private static string GetIconColorRowContent(IconStyle iconStyle)
@@ -138,16 +139,9 @@ namespace IRL_Image_Creator.Windows.IconStyleForms
 
         private void SetButtonEnabled()
         {
-            if (IconStyleListView.SelectedItems.Count == 0)
-            {
-                EditButton.Enabled = false;
-                DeleteButton.Enabled = false;
-            }
-            else
-            {
-                EditButton.Enabled = true;
-                DeleteButton.Enabled = true;
-            }
+            bool itemSelected = IconStyleListView.SelectedItems.Count > 0;
+            EditButton.Enabled = itemSelected;
+            DeleteButton.Enabled = itemSelected;
         }
 
         private void IconStyleListView_SelectedIndexChanged(object sender, EventArgs e)

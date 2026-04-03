@@ -1,5 +1,8 @@
-﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
-using System.IO;
+﻿using IRL_Common_Library.Utils;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
+using System.Diagnostics;
 
 namespace IRL_Gui_Image_Builder_Library.CodeGeneration.Utils
 {
@@ -77,16 +80,23 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.Utils
             sw.WriteLine("/*** end of file ***/");
         }
 
-        public static void Define(StreamWriter sw, string key, string value)
+        public static void Define(StreamWriter sw, string key, string value, string comment)
         {
+            string commentString = string.IsNullOrEmpty(comment) ? "" : " /* " + comment + " */";
+
             if (string.IsNullOrEmpty(value))
             {
-                sw.WriteLine("#define " + key.ToUpper());
+                sw.WriteLine("#define " + key.ToUpper() + commentString);
             }
             else
             {
-                sw.WriteLine("#define " + key.ToUpper() + " " + value);
+                sw.WriteLine("#define " + key.ToUpper() + " " + value + commentString);
             }
+        }
+
+        public static void Define(StreamWriter sw, string key, string value)
+        {
+            Define(sw, key, value, "");
         }
 
         public static void DefineIfNotDefined(StreamWriter sw, string key, string value)
@@ -115,6 +125,152 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.Utils
             Define(sw, "FS_IMAGE_FILE_VERSION_MINOR ", settings.VersionMinor.ToString() + "u");
             Define(sw, "FS_IMAGE_FILE_VERSION_PATCH ", settings.VersionPatch.ToString() + "u");
             Define(sw, "FS_IMAGE_FILE_VERSION_REVISION ", settings.VersionRevision.ToString() + "u");
+        }
+
+        public static void AddDataLocationCompressionTypesDefines(StreamWriter sw, List<DataLocation> dataLocations)
+        {
+            foreach (DataLocation dataLocation in dataLocations)
+            {
+                string id = dataLocation.LocationID.ToString();
+                string compressionTypeValue = ((int)dataLocation.CompressionType).ToString();
+                string comment = "Compression " + dataLocation.CompressionType.ToString();
+                Define(sw, "FS_DATA_LOCATION_" + id + "_COMPRESSION", compressionTypeValue, comment);
+            }
+        }
+
+        public static void AddDataLocations(StreamWriter sw, List<DataLocation> dataLocations)
+        {
+            sw.WriteLine("typedef enum");
+            sw.WriteLine("{");
+            foreach (DataLocation dataLocation in dataLocations)
+            {
+                string idString = dataLocation.LocationID.ToString();
+                sw.WriteLine("    FS_DATA_LOCATION_" + idString + " = " + idString + ",");
+            }
+            sw.WriteLine("} fs_data_location_e;");
+
+            BlankLine(sw);
+            sw.WriteLine("typedef enum\n" +
+                "{\n" +
+                "    NONE = 0,\n" +
+                "    RLE = 1,\n" +
+                "    RLE_ALPHA = 2,\n" +
+                "} fs_compression_e;");
+        }
+
+        public static void AddFileCompressionFunction(StreamWriter sw, List<DataLocation> dataLocations)
+        {
+            if (dataLocations.Count == 0)
+            {
+                return;
+            }
+
+            sw.WriteLine("fs_compression_e fs_getCompression(fs_data_location_e location)");
+            sw.WriteLine("{");
+
+            if (dataLocations.Count == 1)
+            {
+                sw.WriteLine("    return FS_DATA_LOCATION_0_COMPRESSION;");
+            }
+            else
+            {
+                sw.WriteLine("    switch (location)");
+                sw.WriteLine("    {");
+                foreach (DataLocation dataLocation in dataLocations)
+                {
+                    string idString = dataLocation.LocationID.ToString();
+                    sw.WriteLine("        case FS_DATA_LOCATION_" + idString + ":");
+                    sw.WriteLine("            return FS_DATA_LOCATION_" + idString + "_COMPRESSION;");
+                }
+                sw.WriteLine("        default: return NONE;");
+                sw.WriteLine("    }");
+            }
+
+            sw.WriteLine("}");
+        }
+
+
+        public static void WriteDataLocationFileIndex(StreamWriter sw, FsbBuilder fsbBuilder)
+        {
+            if (fsbBuilder.DataLocations.Count > 1)
+            {
+                int[] fileDataLocations = new int[fsbBuilder.DataLocations.Count];
+                int[] fileIndeces = new int[fsbBuilder.DataLocations.Count];
+                int index = 0;
+                int currentId = -1;
+
+                ResetFileDataLocations(ref fileDataLocations);
+
+                for (int i = 0; i < fsbBuilder.FileInfos.Count; i++)
+                {
+                    FsbFileInfo fsbFileInfo = fsbBuilder.FileInfos[i];
+
+                    if (fsbFileInfo.DataLocation.LocationID != currentId)
+                    {
+                        bool idAlreadyInArray = IsDataLocationIdInArray(fsbFileInfo.DataLocation.LocationID, fileDataLocations);
+
+                        if (!idAlreadyInArray && fsbFileInfo.DataLocation.LocationID != -1)
+                        {
+                            currentId = fsbFileInfo.DataLocation.LocationID;
+                            fileDataLocations[index] = currentId;
+                            fileIndeces[index] = fsbBuilder.FileInfos[i].FileIndex;
+                            index++;
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Warning: File " + fsbFileInfo.Filename + " has no data location assigned.");
+                        }
+                    }
+                }
+
+                sw.WriteLine($"    if (fileIndex >= {fileIndeces[fileIndeces.Length - 1]})");
+                sw.WriteLine("    {");
+                sw.WriteLine($"        *p_dataLocation = {fileDataLocations[fileDataLocations.Length - 1]};");
+                sw.WriteLine("    }");
+                if (fileDataLocations.Length > 2)
+                {
+                    for (int i = (fileDataLocations.Length - 2); i > 0; i--)
+                    {
+                        sw.WriteLine($"    else if (fileIndex >= {fileIndeces[i] + 1})");
+                        sw.WriteLine("    {");
+                        sw.WriteLine($"        *p_dataLocation = {fileDataLocations[i]};");
+                        sw.WriteLine("    }");
+                    }
+                }
+                sw.WriteLine("    else");
+                sw.WriteLine("    {");
+                sw.WriteLine($"        *p_dataLocation = {fileDataLocations[0]};");
+                sw.WriteLine("    }");
+            }
+            else if (fsbBuilder.DataLocations.Count == 1)
+            {
+                sw.WriteLine($"    *p_dataLocation = {fsbBuilder.DataLocations[0].LocationID};");
+            }
+            else
+            {
+                Log.Error("Error: No data locations found in the FSB builder. Cannot write file index to data location mapping.");
+            }
+        }
+
+        private static void ResetFileDataLocations(ref int[] fileDataLocations)
+        {
+            for (int i = 0; i < fileDataLocations.Length; i++)
+            {
+                fileDataLocations[i] = -1;
+            }
+        }
+
+        private static bool IsDataLocationIdInArray(int id, int[] array)
+        {
+            foreach (int value in array)
+            {
+                if (value == id)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

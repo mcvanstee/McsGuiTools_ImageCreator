@@ -43,7 +43,7 @@ namespace IRL_Image_Creator.Windows
             
             if (result == DialogResult.OK && !string.IsNullOrEmpty(ProjectFolderDialog.SelectedPath))
             {
-                bool exist = Directory.EnumerateFiles(ProjectFolderDialog.SelectedPath, $"*{FileConstants.ProjectFileExtension}").Any();
+                bool exist = Directory.EnumerateFiles(ProjectFolderDialog.SelectedPath, $"*{FileConstants.PROJECT_FILE_EXTENSION}").Any();
 
                 if (exist)
                 {

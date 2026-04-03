@@ -5,6 +5,7 @@ using IRL_Image_Creator.Projects;
 using IRL_Image_Creator.Windows.IconStyleForms;
 using Svg;
 using System.Xml;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
 
 namespace IRL_Image_Creator.Windows.Helpers
 {
@@ -119,6 +120,29 @@ namespace IRL_Image_Creator.Windows.Helpers
             }
         }
 
+        public static void SelectIconDataLocation(Project project, ListView iconListView, Form owner)
+        {
+            SelectIconDataLocationForm selectIconDataLocationForm = new(project);
+            selectIconDataLocationForm.StartPosition = FormStartPosition.CenterParent;
+            DialogResult result = selectIconDataLocationForm.ShowDialog(owner);
+
+            if (result == DialogResult.OK)
+            {
+                int selectedId = selectIconDataLocationForm.SelectedDataLocationId;
+                
+                foreach (ListViewItem selectedItem in iconListView.SelectedItems)
+                {
+                    SvgFileInfo svgFileInfo = (SvgFileInfo)selectedItem.Tag;
+                    if (svgFileInfo != null)
+                    {
+                        svgFileInfo.DataLocationId = selectedId;
+                    }
+                }
+
+                RefreshImageListView(project, iconListView);
+            }
+        }
+
         public static void RefreshImageListView(Project project, ListView imagesListView)
         {
             imagesListView.Items.Clear();
@@ -133,12 +157,21 @@ namespace IRL_Image_Creator.Windows.Helpers
 
             foreach (SvgFileInfo svgFileInfo in instruction.SvgFileInfos)
             {
+                DataLocation dataLocation = DataLocation.GetDataLocation(svgFileInfo.DataLocationId, project.ImageBuilderSettings.DataLocations);
+                string dataLocationName = svgFileInfo.DataLocationId.ToString();
+
+                if (dataLocation != null)
+                {
+                    dataLocationName += " - " + dataLocation.Name;
+                }
+
                 string styleRowContent = GetStyleRowContent(project.IconStyles, svgFileInfo);
                 string[] row =
                 {
                     svgFileInfo.Filename,
                     svgFileInfo.IconName,
-                    styleRowContent
+                    styleRowContent,
+                    dataLocationName
                 };
 
                 ListViewItem listViewItem = new(row);
@@ -146,7 +179,7 @@ namespace IRL_Image_Creator.Windows.Helpers
                 imagesListView.Items.Add(listViewItem);
             }
 
-            imagesListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            ListViewHelper.AutoResizeColumns(imagesListView);
         }
 
 

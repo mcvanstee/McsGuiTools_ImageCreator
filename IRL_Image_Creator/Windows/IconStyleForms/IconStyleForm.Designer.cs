@@ -57,7 +57,7 @@
             tableLayoutPanel1.RowCount = 2;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 30F));
-            tableLayoutPanel1.Size = new Size(674, 431);
+            tableLayoutPanel1.Size = new Size(670, 431);
             tableLayoutPanel1.TabIndex = 0;
             // 
             // IconStyleListView
@@ -68,7 +68,7 @@
             IconStyleListView.Location = new Point(3, 3);
             IconStyleListView.MultiSelect = false;
             IconStyleListView.Name = "IconStyleListView";
-            IconStyleListView.Size = new Size(668, 395);
+            IconStyleListView.Size = new Size(664, 395);
             IconStyleListView.TabIndex = 1;
             IconStyleListView.UseCompatibleStateImageBehavior = false;
             IconStyleListView.View = View.Details;
@@ -113,13 +113,13 @@
             panel1.Location = new Point(0, 401);
             panel1.Margin = new Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(674, 30);
+            panel1.Size = new Size(670, 30);
             panel1.TabIndex = 0;
             // 
             // CloseButton
             // 
             CloseButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            CloseButton.Location = new Point(596, 3);
+            CloseButton.Location = new Point(592, 3);
             CloseButton.Name = "CloseButton";
             CloseButton.Size = new Size(75, 23);
             CloseButton.TabIndex = 5;
@@ -161,7 +161,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(674, 431);
+            ClientSize = new Size(670, 431);
             Controls.Add(tableLayoutPanel1);
             Name = "IconStyleForm";
             Text = "Icon Style";

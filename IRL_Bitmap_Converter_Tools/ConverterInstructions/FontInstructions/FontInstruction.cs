@@ -11,6 +11,9 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.FontInstructions
         [XmlArray("")]
         public List<FontBitmap> FontBitmaps { get; set; } = new();
 
+        [XmlElement]
+        public int DataLocationId { get; set; } = 0;
+
         public FontInstruction() { }
     }
 }

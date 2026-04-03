@@ -50,7 +50,7 @@
             label9 = new Label();
             tableLayoutPanel7 = new TableLayoutPanel();
             label2 = new Label();
-            BackColorTB = new CustomComponents.TextBoxes.ColorTextBox();
+            BackColorTB = new IRL_Image_Creator.CustomComponents.TextBoxes.ColorTextBox();
             panel1 = new Panel();
             backColorLabel = new Label();
             SelectBackColorButton = new Button();
@@ -350,7 +350,6 @@
             // BackColorTB
             // 
             BackColorTB.BackColor = SystemColors.Control;
-            BackColorTB.Color = SystemColors.Window;
             BackColorTB.Location = new Point(87, 3);
             BackColorTB.MinimumSize = new Size(0, 30);
             BackColorTB.Name = "BackColorTB";

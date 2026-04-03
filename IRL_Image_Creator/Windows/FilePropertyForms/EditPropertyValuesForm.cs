@@ -1,4 +1,5 @@
-﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 
 namespace Gui_Image_Builder
 {

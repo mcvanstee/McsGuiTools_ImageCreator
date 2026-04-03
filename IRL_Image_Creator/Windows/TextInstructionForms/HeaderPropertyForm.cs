@@ -1,4 +1,4 @@
-﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+﻿using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 using System.ComponentModel;
 
 namespace IRL_Image_Creator.Windows.MainFormModels

@@ -14,6 +14,9 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.IconInstructions
         [XmlElement]
         public string SvgString { get; set; } = "";
 
+        [XmlElement]
+        public int DataLocationId { get; set; } = 0;
+
         [XmlArray("")]
         public List<int> ImageBitmapStyleIds { get; set; } = new();
 

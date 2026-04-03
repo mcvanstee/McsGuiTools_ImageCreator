@@ -1,5 +1,6 @@
 ﻿using IRL_Bitmap_Converter_Tools.ConverterInstructions;
 using IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions;
+using IRL_Common_Library.Consts;
 using IRL_Common_Library.Utils;
 using IRL_Gui_Image_Builder_Library.Projects;
 using IRL_Image_Creator.Projects;
@@ -22,6 +23,13 @@ namespace IRL_Image_Creator.Windows.Helpers
         {
             SetListViewHeader(textInstruction, listView);
 
+            if (textInstruction.Table.ColumnWidths.Count != (textInstruction.Table.NumberOfColumns + 1))
+            {
+                textInstruction.Table.ResetColumnWidths();
+            }
+
+            SetColumnWidths(textInstruction, listView);
+
             foreach (TextRecord record in textInstruction.Table.Records)
             {
                 string styleRowContent = GetStyleRowContent(textStyles, record);
@@ -42,8 +50,14 @@ namespace IRL_Image_Creator.Windows.Helpers
 
                 listView.Items.Add(listViewItem);
             }
+        }
 
-            listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        private static void SetColumnWidths(TextInstruction textInstruction, ListView listView)
+        {
+            for (int i = 0; i < textInstruction.Table.ColumnWidths.Count; i++)
+            {
+                listView.Columns[i].Width = textInstruction.Table.ColumnWidths[i];
+            }
         }
 
         public static void RefreshTextInstructionList(ListView listView, Project project)
@@ -60,11 +74,12 @@ namespace IRL_Image_Creator.Windows.Helpers
             }
         }
 
-        public static void ListViewSelectFirst(ListView listView)
+        public static void ListViewSelectFirst(ListView listView, ref int currentSelectedIndex)
         {
             if (listView.Items.Count > 0)
             {
                 listView.Items[0].Selected = true;
+                currentSelectedIndex = 0;
             }
         }
 
@@ -109,7 +124,7 @@ namespace IRL_Image_Creator.Windows.Helpers
             }
         }
 
-        public static void DeleteTextInstructionk(Project project, ListView textInstructionListView)
+        public static void DeleteTextInstruction(Project project, ListView textInstructionListView)
         {
             if (textInstructionListView.SelectedItems.Count > 0)
             {
@@ -134,7 +149,7 @@ namespace IRL_Image_Creator.Windows.Helpers
         {
             if (textInstructionListView.SelectedItems.Count > 0)
             {
-                Log.OpenNewFile(BuildFolders.LogFolderPath(project.ProjectFolder));
+                Log.OpenNewFile(FileConstants.GetLogFolder(), project.ImageBuilderSettings.LogVerbose);
 
                 ListViewItem selectedItem = textInstructionListView.SelectedItems[0];
 
@@ -284,6 +299,25 @@ namespace IRL_Image_Creator.Windows.Helpers
             else
             {
                 ResetTextToConvertListView(listView);
+            }
+        }
+
+        public static void UpdateTextDataLocationComboBoxValue(
+            Project project, ListView textInstructionListView, ComboBox dataLocationComboBox)
+        {
+            if (textInstructionListView.SelectedItems.Count > 0)
+            {
+                ListViewItem selectedItem = textInstructionListView.SelectedItems[0];
+                TextInstruction textInstruction = (TextInstruction)project.Instructions.Find(x => x.Name == selectedItem.Text);
+                
+                if (textInstruction != null)
+                {
+                    dataLocationComboBox.SelectedValue = textInstruction.DataLocationId;
+                }
+                else
+                {
+                    dataLocationComboBox.SelectedIndex = 0;
+                }
             }
         }
     }

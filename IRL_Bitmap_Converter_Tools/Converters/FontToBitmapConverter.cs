@@ -9,8 +9,8 @@ namespace IRL_Bitmap_Converter_Tools.Converters
     public static class FontToBitmapConverter
     {
         public static bool BuildFontBitmaps(
-            FontBitmap fontBitmap, List<FontBitmapStyle> fontBitmapStyles, bool bitmapMaskOnly, 
-            List<ConverterFont> fonts, string outputPath, 
+            FontBitmap fontBitmap, List<FontBitmapStyle> fontBitmapStyles, bool bitmapMask, 
+            List<ConverterFont> fonts, string datalocation, string outputPath, 
             FontFileKeyFormat fontFileKeyFormat, ConverterStatusUpdater statusUpdater)
         {
             bool result = true;
@@ -31,8 +31,13 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
                 if (style != null)
                 {
-                    string fontName = GetFontName(font, fontBitmap, fontFileKeyFormat, style, converterFontName, bitmapMaskOnly);
-                    string path = $"{outputPath}\\{fontName}";
+                    string fontName = GetFontName(font, fontBitmap, fontFileKeyFormat, style, converterFontName, bitmapMask);
+                    string path = Path.Combine(outputPath, fontName);
+
+                    if (!string.IsNullOrEmpty(datalocation))
+                    {
+                        path += $"{datalocation}";
+                    }
 
                     statusUpdater.UpdateStatusAndInstructionsConverted($"Font: {fontName}", 1);
 
@@ -45,7 +50,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                     else
                     {
                         Directory.CreateDirectory(path);
-                        CreateASCIICharacterBitmaps(font, style, bitmapMaskOnly, path);
+                        CreateASCIICharacterBitmaps(font, style, bitmapMask, path);
                     }
                 }
                 else
@@ -175,7 +180,6 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             }
             
             return result;
-
         }
 
         private static string GetConverterFontName(int fontConverterId, List<ConverterFont> fonts)
@@ -196,12 +200,12 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
         private static string GetFontName(
             Font font, FontBitmap fontBitmap, FontFileKeyFormat fontFileKeyFormat, 
-            FontBitmapStyle style, string converterFontName, bool bitmapMaskOnly)
+            FontBitmapStyle style, string converterFontName, bool bitmapMask)
         {
             int fontSize = (int)font.Size;
             string fontName;
 
-            if (bitmapMaskOnly)
+            if (bitmapMask)
             {
                 fontName = $"{fontBitmap.FontName}_{fontSize}_{GetFontStyleString(fontBitmap.FontStyle)}";
 

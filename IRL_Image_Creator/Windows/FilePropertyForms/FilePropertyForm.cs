@@ -1,5 +1,5 @@
 ﻿using Gui_Image_Builder;
-using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Builder;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
 using IRL_Image_Creator.Projects;
 using System;
 using System.Collections.Generic;

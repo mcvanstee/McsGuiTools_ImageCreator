@@ -13,6 +13,9 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions
         [XmlArray("")]
         public List<TextRecord> Records { get; set; } = new();
 
+        [XmlArray("")]
+        public List<int> ColumnWidths { get; set; } = new();
+
         [XmlElement]
         public BitmapProperty TranslationProperty { get; set; } = new();
 
@@ -20,5 +23,15 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions
         public bool Translate { get; set; }
 
         public TextTable() { }
+
+        public void ResetColumnWidths()
+        {
+            ColumnWidths.Clear();
+
+            for (int i = 0; i < NumberOfColumns + 1; i++)
+            {
+                ColumnWidths.Add(60);
+            }
+        }
     }
 }

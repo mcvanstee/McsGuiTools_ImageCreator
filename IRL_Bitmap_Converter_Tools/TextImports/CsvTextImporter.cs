@@ -19,6 +19,7 @@ namespace IRL_Bitmap_Converter_Tools.TextImports
             }
 
             table.NumberOfColumns = numberOfColumns;
+            table.ResetColumnWidths();
 
             int startRow = 0;
 

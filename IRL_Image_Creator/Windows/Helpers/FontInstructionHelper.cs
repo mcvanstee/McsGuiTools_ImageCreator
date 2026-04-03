@@ -3,6 +3,7 @@ using IRL_Bitmap_Converter_Tools.ConverterInstructions;
 using IRL_Image_Creator.Projects;
 using IRL_Image_Creator.Windows.FontStyleForms;
 using IRL_Image_Creator.Windows.FontForms;
+using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
 
 namespace IRL_Image_Creator.Windows.Helpers
 {
@@ -38,7 +39,9 @@ namespace IRL_Image_Creator.Windows.Helpers
                 fontsListView.Items.Add(listViewItem);
             }
 
-            fontsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            ListViewHelper.AutoResizeColumns(fontsListView);
+
+            fontsListView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
         public static void AddFont(Project project, ListView fontsListView, FontDialog fontDialog, Form owner)
@@ -180,6 +183,24 @@ namespace IRL_Image_Creator.Windows.Helpers
             }
 
             return "Custom";
+        }
+
+        public static void UpdateFontDataLocationComboBoxValue(Project project, ComboBox fontDataLocationComboBox)
+        {
+            FontInstruction instruction = GetFontInstruction(project.Instructions);
+
+            if (instruction != null)
+            {
+                DataLocation fontDataLocation = DataLocation.GetDataLocation(instruction.DataLocationId, project.ImageBuilderSettings.DataLocations);
+                if (fontDataLocation != null)
+                {
+                    fontDataLocationComboBox.SelectedValue = fontDataLocation.LocationID.ToString();
+                }
+                else
+                {
+                    fontDataLocationComboBox.SelectedIndex = 0;
+                }
+            }
         }
     }
 }
