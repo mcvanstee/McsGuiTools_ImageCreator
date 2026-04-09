@@ -1310,6 +1310,7 @@
             // VersionRevisionInput
             // 
             VersionRevisionInput.Location = new Point(211, 90);
+            VersionRevisionInput.Maximum = new decimal(new int[] { 9999, 0, 0, 0 });
             VersionRevisionInput.Name = "VersionRevisionInput";
             VersionRevisionInput.Size = new Size(59, 23);
             VersionRevisionInput.TabIndex = 62;

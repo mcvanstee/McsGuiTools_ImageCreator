@@ -188,7 +188,6 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Fonts
         private void AddFontPixelData(PixelData pixelData, FsFont font)
         {
             CompressionType compression = pixelData.DataLocation.CompressionType;
-            int offset = pixelData.Offset;
             int bytesPerPixel = m_builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? 3 : 2;
             int totalUncompressedBytes = 0;
             int totalCompressedBytes = 0;
@@ -208,13 +207,13 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Fonts
                 {
                     byte[] convertedPixelData = PixelDataConverter.GetConvertedPixelData(bitmap, m_builderSettings.PixelDataFormat);
                     pixelData.AppendData(convertedPixelData, charInfo);
-                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
+                    charInfo.UpdateValues((uint)(dataOffset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
                 }
                 else if (compression == CompressionType.RLE && font.DataLocation.CompressionType == compression)
                 {
                     byte[] convertedPixelData = PixelDataConverter.GetPixelData_RLE(bitmap, m_builderSettings.PixelDataFormat);
                     pixelData.AppendData(convertedPixelData, charInfo);
-                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
+                    charInfo.UpdateValues((uint)(dataOffset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
 
                     int uncompressedBytes = bitmap.Width * bitmap.Height * bytesPerPixel;
                     totalUncompressedBytes += uncompressedBytes;
@@ -224,7 +223,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Fonts
                 {
                     byte[] convertedPixelData = PixelDataConverter.GetPixelData_RLE_Alpha(bitmap);
                     pixelData.AppendData(convertedPixelData, charInfo);
-                    charInfo.UpdateValues((uint)(dataOffset + offset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
+                    charInfo.UpdateValues((uint)(dataOffset), (ushort)bitmap.Width, (ushort)bitmap.Height, (uint)convertedPixelData.Length);
 
                     int uncompressedBytes = bitmap.Width * bitmap.Height * bytesPerPixel;
                     totalUncompressedBytes += uncompressedBytes;

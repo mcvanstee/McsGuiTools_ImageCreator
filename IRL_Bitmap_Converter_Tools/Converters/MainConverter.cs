@@ -179,8 +179,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                 bool bitmapMask = dataLocation.CompressionType == CompressionType.RLE_Alpha;
                 string dataLocationStr = $"{DataLocation.DATA_LOCATION_PREFIX}{dataLocation.LocationID}";
                 string bmpPath = Path.Combine(FileConstants.GetConverterOutputFolder(), "_Icons" + dataLocationStr);
-                //outputFolder + FileConstants.BMP_IMPORT_FOLDER + FileConstants.CONVERTER_OUTPUT_FOLDER + "\\_Icons" + dataLocationStr;
-
+   
                 Directory.CreateDirectory(bmpPath);
 
                 bool iconBitmapsCreated = IconConverter.ConvertSvgToBitmaps(svgFileInfo, iconStyles, bitmapMask, statusUpdater, bmpPath);
@@ -208,8 +207,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         public static void ClearBuildFolders()
         {
             string bmpPath = FileConstants.GetConverterOutputFolder();
-            //outputFolder + FileConstants.BMP_IMPORT_FOLDER + FileConstants.CONVERTER_OUTPUT_FOLDER;
-            string fontPath = FileConstants.GetFontImportFolder(); //outputFolder + FileConstants.FONT_IMPORT_FOLDER;
+            string fontPath = FileConstants.GetFontImportFolder();
 
             if (Directory.Exists(bmpPath))
             {

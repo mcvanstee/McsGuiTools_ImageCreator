@@ -6,7 +6,6 @@ using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.PixelDatas;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
-using System.Diagnostics;
 using System.Drawing;
 
 namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
@@ -150,93 +149,30 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                     fsbFileInfo.FsbFile.UpdateValues(0xFFFFFFFF, properties, 0, 0);
                 }
             }
-
-
-            // For testing, to analyze the RLE data and get a list of unique color values in the RLE data, to see if there are patterns that can be used for compression.
-
-            if (/*pixelData.DataLocation.CompressionType == CompressionType.RLE ||*/ 
-                pixelData.DataLocation.CompressionType == CompressionType.RLE_Alpha)
-            {
-                foreach (DataItemBase item in pixelData.DataItems)
-                {
-                    if (item.Type == DataType.Bitmap)
-                    {
-                        ImageDataItem imageDataItem = (ImageDataItem)item;
-                        Debug.WriteLine(imageDataItem.FileInfo.Filename);
-                    }
-
-                    List<byte> colorValues = [];
-
-                    for (int i = 0; i < item.Data.Length - 1; i++)
-                    {
-                        byte value = item.Data[i];
-                        if (value != 0x00 && value != 0x0F)
-                        {
-                            byte colorValue = (byte)((item.Data[i + 1] & 0x0F) << 4);
-
-                            if (!colorValues.Contains(colorValue))
-                            {
-                                colorValues.Add(colorValue);
-                            }
-                        }
-                        else
-                        {
-                            i++;
-                        }
-
-                    }
-
-                    //for (int i = 1; i < item.Data.Length - 1; i+=2)
-                    //{
-                    //    // RLE data is stored as count, value, count, value, etc. So we need to read the value at every odd index and add it to the list of color values.
-                    //    // Add color value to list if not already in list, to get a list of unique color values in the RLE data.
-                    //    byte colorValue = item.Data[i];
-                    //    if (!colorValues.Contains(colorValue))
-                    //    {
-                    //        colorValues.Add(colorValue); 
-                    //    }
-                    //}
-
-                    colorValues.Sort();
-
-                    Debug.WriteLine(colorValues.Count.ToString() + " Unique color values in RLE data: " + string.Join(", ", colorValues.Select(b => b.ToString("X2"))));
-                }
-
-
-
-                //byte[] convertedPixelData = pixelData.Data;
-                //PatternCompression.FindRLEDataPatterns(convertedPixelData, 4);
-                //PatternCompressionRle.AnalyzeRleDataPatterns(pixelData, 3, 2);
-
-
-                //PatternCompressionRle patternCompressionRle = new(3, 2);
-                //patternCompressionRle.CompressPixelDataWithPatterns(pixelData);
-            }
         }
 
         private void AddPixelData(PixelData pixelData, FsbFileInfo fsbFileInfo, ushort properties)
         {
             CompressionType compression = pixelData.DataLocation.CompressionType;
-            int offset = pixelData.Offset;
 
             if (compression == CompressionType.None && fsbFileInfo.DataLocation.CompressionType == compression)
             {
-                AddPixelDataCompressionNone(pixelData, fsbFileInfo, offset, properties);
+                AddPixelDataCompressionNone(pixelData, fsbFileInfo, properties);
             }
             else if (compression == CompressionType.RLE && fsbFileInfo.DataLocation.CompressionType == compression)
             {
-                AddPixelDataCompressionRLE(pixelData, fsbFileInfo, offset, properties);
+                AddPixelDataCompressionRLE(pixelData, fsbFileInfo, properties);
             }
             else if (compression == CompressionType.RLE_Alpha && fsbFileInfo.DataLocation.CompressionType == compression)
             {
-                AddPixelDataCompressionRLEAlpha(pixelData, fsbFileInfo, offset, properties);
+                AddPixelDataCompressionRLEAlpha(pixelData, fsbFileInfo, properties);
             }
             else
             {
             }
         }
 
-        private void AddPixelDataCompressionNone(PixelData pixelData, FsbFileInfo fsbFileInfo, int offset, ushort properties)
+        private void AddPixelDataCompressionNone(PixelData pixelData, FsbFileInfo fsbFileInfo, ushort properties)
         {
             m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
 
@@ -247,10 +183,10 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
             pixelData.AppendData(convertedPixelData, fsbFileInfo);
 
             fsbFileInfo.FsbFile.UpdateValues(
-                (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
+                (uint)(writeIndex), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
         }
 
-        private void AddPixelDataCompressionRLE(PixelData pixelData, FsbFileInfo fsbFileInfo, int offset, ushort properties)
+        private void AddPixelDataCompressionRLE(PixelData pixelData, FsbFileInfo fsbFileInfo, ushort properties)
         {
             m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
 
@@ -261,7 +197,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
             pixelData.AppendData(convertedPixelData, fsbFileInfo);
 
             fsbFileInfo.FsbFile.UpdateValues(
-                (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
+                (uint)(writeIndex), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
 
             int bytesPerPixel = m_builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? 3 : 2;
             int uncompressedBytes = bitmap.Width * bitmap.Height * bytesPerPixel;
@@ -273,7 +209,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
             Log.WritePixelDataRLE(convertedPixelData);       
         }
 
-        private void AddPixelDataCompressionRLEAlpha(PixelData pixelData, FsbFileInfo fsbFileInfo, int offset, ushort properties)
+        private void AddPixelDataCompressionRLEAlpha(PixelData pixelData, FsbFileInfo fsbFileInfo, ushort properties)
         {
             m_statusUpdater.UpdateStatusAndFilesConverted("Converting pixeldata: " + fsbFileInfo.Filename, 1);
 
@@ -284,7 +220,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
             pixelData.AppendData(convertedPixelData, fsbFileInfo);
 
             fsbFileInfo.FsbFile.UpdateValues(
-                (uint)(writeIndex + offset), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
+                (uint)(writeIndex), properties, (ushort)bitmap.Width, (ushort)bitmap.Height);
 
             int bytesPerPixel = m_builderSettings.PixelDataFormat.PixelFormat == PixelFormat.RGB ? 3 : 2;
             int uncompressedBytes = bitmap.Width * bitmap.Height * bytesPerPixel;

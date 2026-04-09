@@ -50,6 +50,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder
             if (fileSystemBuild || fontsCreated)
             {
                 AddPixelDatas(fsbBuilder, fontBuilder, pixelDatas);
+                UpdatePixelDataOffsets(pixelDatas);
                 statusUpdater.UpdateStatus("Create Files");
 
                 CreateImageFiles(builderSettings, fsbBuilder, fontBuilder, pixelDatas);
@@ -81,13 +82,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder
         {            
             foreach (DataLocation dataLocation in fsbBuilder.DataLocations)
             {
-                //int offset = (dataLocation.DataLocationType == DataLocationType.File) ? ImageFileHeader.IMAGE_FILE_HEADER_SIZE : 0;
                 PixelData pixelData = new(dataLocation);
-                //{
-                //    Offset = offset,
-                //    DataLocation = dataLocation
-                //};
-
                 fsbBuilder.AddPixelData(pixelData);
                 pixelDatas.Add(pixelData);
             }
@@ -98,15 +93,39 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder
                 {
                     PixelData pixelData = pixelDatas.Find(pd => pd.DataLocation == dataLocation)!;
                     fontBuilder.AddPixelData(pixelData);
-                    pixelDatas.Add(pixelData);
                 }
                 else
                 {
-                    //int offset = (dataLocation.DataLocationType == DataLocationType.File) ? ImageFileHeader.IMAGE_FILE_HEADER_SIZE : 0;
                     PixelData pixelData = new(dataLocation);
 
                     fontBuilder.AddPixelData(pixelData);
                     pixelDatas.Add(pixelData);
+                }
+            }
+        }
+
+        private static void UpdatePixelDataOffsets(List<PixelData> pixelDatas)
+        {
+            foreach (PixelData pixelData in pixelDatas)
+            {
+                uint offset = (pixelData.DataLocation.DataLocationType == DataLocationType.Code) ? 0 : (uint)ImageFileHeader.IMAGE_FILE_HEADER_SIZE;
+
+                foreach (DataItemBase dataItem in pixelData.DataItems)
+                {
+                    if (dataItem.Type == DataType.Bitmap)
+                    {
+                        ImageDataItem bitmap = dataItem as ImageDataItem;
+                        bitmap.FileInfo.FsbFile.DataOffset += offset;
+                    }
+                    else if (dataItem.Type == DataType.Font)
+                    {
+                        FontDataItem font = dataItem as FontDataItem;
+                        font.CharacterInfo.DataOffset += offset;
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown data type in pixel data.");
+                    }
                 }
             }
         }
