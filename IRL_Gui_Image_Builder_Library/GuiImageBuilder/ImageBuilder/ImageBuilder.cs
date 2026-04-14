@@ -55,7 +55,8 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder
 
                 CreateImageFiles(builderSettings, fsbBuilder, fontBuilder, pixelDatas);
                 
-                FileSystemCodeGenerator.CreateCodeFiles(builderSettings, fsbBuilder, pixelDatas);
+                FileSystemCodeGenerator.CreateCodeFiles(builderSettings, fsbBuilder);
+                FileSystemCodeGenerator.CreatePixelDataFiles(builderSettings, fsbBuilder, pixelDatas);
                 FSColorHeaderGenerator.CreateColorHeader(fsColors);
                 VersionHeaderGenerator.CreateVersionHeader(builderSettings);
                 CrcHeaderGenerator.CreateCrcHeader();

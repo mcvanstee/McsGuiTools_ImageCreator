@@ -9,7 +9,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
     public static class FileSystemCodeGenerator
     {
         public static void CreateCodeFiles(
-            ImageBuilderSettings builderSettings, FsbBuilder fsbBuilder, List<PixelData> pixelDatas)
+            ImageBuilderSettings builderSettings, FsbBuilder fsbBuilder)
         {
             if (!fsbBuilder.FileSystemBuilt)
             {
@@ -26,7 +26,10 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
                 FSHeaderFileCodeGenerator.CreateFileKeyHeader(builderSettings, fsbBuilder);
                 FSCFileCodeGenerator.CreateFileSystemCFile(builderSettings, fsbBuilder);
             }
+        }
 
+        public static void CreatePixelDataFiles(ImageBuilderSettings builderSettings, FsbBuilder fsbBuilder, List<PixelData> pixelDatas)
+        {
             foreach (PixelData pixelData in pixelDatas)
             {
                 if ((pixelData.DataLocation.DataLocationType == DataLocationType.Code) &&
