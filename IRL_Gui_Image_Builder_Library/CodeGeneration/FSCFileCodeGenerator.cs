@@ -27,6 +27,8 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("");
             sw.WriteLine("bool fs_getFileInfo(const file_key_e file_key, fs_file_info_s *p_out_file_info, uint8_t *p_dataLocation)");
             sw.WriteLine("{");
+            sw.WriteLine("    const uint32_t fileIndex = (uint32_t)((int32_t)file_key - 1);");
+            sw.WriteLine("");
             sw.WriteLine("    if ((int32_t)file_key <= 0)");
             sw.WriteLine("    {");
             sw.WriteLine("        return false;");
@@ -34,8 +36,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
             sw.WriteLine("");
             CodeGenegrationUtils.WriteDataLocationFileIndex(sw, fsbBuilder);
             sw.WriteLine("");
-            sw.WriteLine("    bool fileFound = false;");
-            sw.WriteLine("    const uint32_t fileIndex = (uint32_t)((int32_t)file_key - 1);");
+            sw.WriteLine("    bool fileFound = false;"); 
             sw.WriteLine("");
             sw.WriteLine("    if (FS_FILES > fileIndex)");
             sw.WriteLine("    {");

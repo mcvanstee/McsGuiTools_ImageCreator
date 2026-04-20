@@ -22,6 +22,9 @@ namespace IRL_Bitmap_Converter_Tools.ConverterInstructions.TextInstructions
         [XmlElement]
         public bool Translate { get; set; }
 
+        [XmlElement]
+        public int NoOfHeaderProperties { get; set; }
+
         public TextTable() { }
 
         public void ResetColumnWidths()

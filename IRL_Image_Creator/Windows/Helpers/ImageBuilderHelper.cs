@@ -140,7 +140,7 @@ namespace IRL_Image_Creator.Windows.Helpers
         {
             Project.Save(project);
 
-            int numberOfTranslations = 0;
+            //int numberOfTranslations = 0;
 
             foreach (ConverterInstruction instruction in project.Instructions)
             {
@@ -148,7 +148,7 @@ namespace IRL_Image_Creator.Windows.Helpers
                 {
                     if (textInstruction.Table.Translate)
                     {
-                        numberOfTranslations =
+                        textInstruction.Table.NoOfHeaderProperties =
                             project.ImageBuilderSettings.Properties.FirstOrDefault(
                                 x => x.Name == textInstruction.Table.TranslationProperty.Name)?.PropertyValues.Count ?? 0;
                     }
@@ -157,7 +157,7 @@ namespace IRL_Image_Creator.Windows.Helpers
 
             return MainConverter.CreateBitmaps(
                 project.Instructions, project.Fonts, project.TextStyles, project.FontBitmapStyles, project.IconStyles,
-                project.ImageBuilderSettings.DataLocations, numberOfTranslations, converterStatusUpdater);
+                project.ImageBuilderSettings.DataLocations, converterStatusUpdater);
         }
 
         private static List<FSColor> GetFSColors(List<ConverterColor> colors)

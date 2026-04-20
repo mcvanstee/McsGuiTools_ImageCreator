@@ -119,7 +119,10 @@ namespace IRL_Bitmap_Converter_Tools.Converters
                     element = node.Attributes["stroke"];
                 }
 
-                element.Value = colorStr;
+                if (element != null)
+                {
+                    element.Value = colorStr;
+                }
             }
         }
 

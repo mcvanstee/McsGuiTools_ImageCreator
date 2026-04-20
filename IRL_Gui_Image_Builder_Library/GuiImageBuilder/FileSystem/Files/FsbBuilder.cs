@@ -59,6 +59,11 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
             ProcessDataLocations();
             FileSystemBuilt = false;
 
+            if (m_files.Count == 0)
+            {
+                return FileSystemBuilt;
+            }
+
             bool sortFilePropertiesOK = FsbFilePropertyBuilder.SortAllFilePropertys(m_builderSettings, FileInfos, m_statusUpdater);
             if (!sortFilePropertiesOK)
             {
@@ -67,27 +72,28 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
 
             bool hasDuplicateFilenames = HasDuplicateFilenames();
 
-            if (m_files.Count == 0 || hasDuplicateFilenames)
+            if (hasDuplicateFilenames)
             {
-                return FileSystemBuilt;
+                throw new ImageBuilderException("Duplicate filenames found in the import folder! Please check the log for more details.");             
             }
 
-            SortFileInfos();
+            //SortFileInfos();
 
             FsbFilePropertyBuilder.AddAllFileProperties(m_builderSettings, m_files, m_statusUpdater);
 
             bool filePropertiesOK = CheckFileProperties();
             if (!filePropertiesOK)
             {
-                return FileSystemBuilt;
+                throw new ImageBuilderException("File properties check failed! Please check the log for more details.");
             }
 
+            SortFileInfos();
             WriteFileNamesToLogFile();
 
             bool hasDuplicateFileKeys = HasDuplicateFileKeys();
             if (hasDuplicateFileKeys)
             {
-                return FileSystemBuilt;
+                throw new ImageBuilderException("Duplicate filekeys found in the import folder! Please check the log for more details.");
             }
 
             for (int i = 0; i < m_files.Count; i++)
@@ -317,13 +323,12 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
 
             while (!string.IsNullOrEmpty(bmpDirectory))
             {
-                if (bmpDirectory.StartsWith("\\"))
+                if (bmpDirectory.StartsWith('\\'))
                 {
                     bmpDirectory = bmpDirectory.Remove(0, 1);
-
                 }
 
-                int index = bmpDirectory.LastIndexOf("\\");
+                int index = bmpDirectory.IndexOf('\\'); //LastIndexOf('\\');
 
                 if (index > 0)
                 {
@@ -354,7 +359,8 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                     {
                         if (!folder.StartsWith("_"))
                         {
-                            key += folder.ToUpper();
+                            string folderKeyName = DataLocation.RemoveDataLocationFromFolderName(folder).ToUpper();
+                            key += folderKeyName;
                             key += "_";
                         }
                     }
@@ -512,6 +518,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                     if (!hasAllFileProperties)
                     {
                         Log.Error("Fileproperties, not the same: " + fsbFileInfo.Filename);
+                        Log.Error($"Hint: Check if all files with the same name have the same fileproperties, and the same number of fileproperties. File Key: {fileName}");
 
                         return false;
                     }

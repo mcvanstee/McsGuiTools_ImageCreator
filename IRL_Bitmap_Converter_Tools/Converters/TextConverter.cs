@@ -8,7 +8,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
     public static class TextConverter
     {
         public static bool ConvertTextInstructionToBitmaps(
-            TextInstruction textInstruction, List<TextStyle> textStyles, bool bitmapMaskOnly, int noOfTranslationPropertyValues, string outputFolder)
+            TextInstruction textInstruction, List<TextStyle> textStyles, bool bitmapMaskOnly, string outputFolder)
         {
             if (Directory.Exists(outputFolder))
             {
@@ -27,11 +27,10 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
                 if (textInstruction.Table.Translate)
                 {
-                    success &= ConvertTranslationTextRecord(record, textStyles, bitmapMaskOnly, textInstruction.Table.TranslationProperty, noOfTranslationPropertyValues, textInstruction.FileKeyPrefix, outputFolder);
+                    success &= ConvertTranslationTextRecord(record, textStyles, bitmapMaskOnly, textInstruction.Table.TranslationProperty, textInstruction.Table.NoOfHeaderProperties, textInstruction.FileKeyPrefix, outputFolder);
                 }
                 else
                 {
-
                     success &= ConvertTextRecord(record, textStyles, bitmapMaskOnly, textInstruction.FileKeyPrefix, outputFolder);
                 }
             }

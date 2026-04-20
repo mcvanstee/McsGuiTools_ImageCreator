@@ -15,7 +15,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         public static bool CreateBitmaps(
             List<ConverterInstruction> instructions, List<ConverterFont> fonts,
             List<TextStyle> textStyles, List<FontBitmapStyle> fontBitmapStyles, List<IconStyle> iconStyles,
-            List<DataLocation> dataLocations, int noOfTranslationPropertyValues, ConverterStatusUpdater statusUpdater)
+            List<DataLocation> dataLocations, ConverterStatusUpdater statusUpdater)
         {
             bool result = false;
 
@@ -29,7 +29,6 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             Log.WriteLine("Clearing build folders...");
             Log.WriteLine($"Output Folder: {FileConstants.GetBuildFolder()}");
             Log.WriteLine($"Number of Instructions: {instructions.Count}");
-            Log.WriteLine($"Number of Translations: {noOfTranslationPropertyValues}");
 
             int noOfFontInstructionsConverted = 0;
             int noOfTextInstructionsConverted = 0;
@@ -37,7 +36,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
             foreach (ConverterInstruction instruction in instructions)
             {
-                result = ProcessInstructions(instruction, textStyles, fontBitmapStyles, iconStyles, fonts, dataLocations, noOfTranslationPropertyValues, statusUpdater);
+                result = ProcessInstructions(instruction, textStyles, fontBitmapStyles, iconStyles, fonts, dataLocations, statusUpdater);
 
                 if (!result)
                 {
@@ -72,7 +71,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
         private static bool ProcessInstructions(
             ConverterInstruction instruction, List<TextStyle> textStyles, List<FontBitmapStyle> fontBitmapStyles, List<IconStyle> iconStyles,
-            List<ConverterFont> fonts, List<DataLocation> dataLocations, int noOfTranslationPropertyValues, ConverterStatusUpdater statusUpdater)
+            List<ConverterFont> fonts, List<DataLocation> dataLocations, ConverterStatusUpdater statusUpdater)
         {
             bool result = true;
 
@@ -88,7 +87,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
             }
             else if (instruction is TextInstruction textInstruction)
             {
-                result = ProcessTextInstruction(textInstruction, dataLocations, textStyles, noOfTranslationPropertyValues, statusUpdater);
+                result = ProcessTextInstruction(textInstruction, dataLocations, textStyles, statusUpdater);
             }
             else if (instruction is IconInstruction iconInstruction)
             {
@@ -138,10 +137,10 @@ namespace IRL_Bitmap_Converter_Tools.Converters
         }
 
         private static bool ProcessTextInstruction(
-            TextInstruction textInstruction, List<DataLocation> dataLocations, List<TextStyle> textStyles, 
-            int noOfTranslationPropertyValues, ConverterStatusUpdater statusUpdater)
+            TextInstruction textInstruction, List<DataLocation> dataLocations, 
+            List<TextStyle> textStyles, ConverterStatusUpdater statusUpdater)
         {
-            string instructionName = textInstruction.Name.Replace(" ", "_");
+            string instructionName = "_" + textInstruction.Name.Replace(" ", "_");
             DataLocation? dataLocation = DataLocation.GetDataLocation(textInstruction.DataLocationId, dataLocations);
 
             if (dataLocation == null)
@@ -164,7 +163,7 @@ namespace IRL_Bitmap_Converter_Tools.Converters
 
             Directory.CreateDirectory(bmpPath);
 
-            return TextConverter.ConvertTextInstructionToBitmaps(textInstruction, textStyles, bitmapMask, noOfTranslationPropertyValues, bmpPath);
+            return TextConverter.ConvertTextInstructionToBitmaps(textInstruction, textStyles, bitmapMask, bmpPath);
         }
 
         private static bool ProcessIconInstruction(
