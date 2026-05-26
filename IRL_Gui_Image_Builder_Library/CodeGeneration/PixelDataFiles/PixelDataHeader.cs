@@ -34,7 +34,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
 
             CodeGenegrationUtils.BlankLine(sw);
             sw.WriteLine(
-                "void fs_read(uint16_t *p_buffer, uint32_t bufferLength, fs_pixeldata_info_s *p_pixelDataInfo);\n" +
+                "uint32_t fs_read(uint16_t *p_buffer, uint32_t bufferLength, fs_pixeldata_info_s *p_pixelDataInfo);\n" +
                 "void fs_transferPixels(fs_pixeldata_info_s *p_pixelDataInfo, void (*transferPixels)(const uint16_t color, const int32_t noOfpixels));\n" +
                 "uint16_t fs_getPixelColor(const uint32_t foreColor, const uint32_t backColor, const uint8_t pixelValue);"
                 );

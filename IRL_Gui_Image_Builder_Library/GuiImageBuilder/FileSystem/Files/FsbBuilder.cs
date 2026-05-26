@@ -6,6 +6,7 @@ using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.DataLocations;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.ImageBuilder.PixelDatas;
 using IRL_Gui_Image_Builder_Library.GuiImageBuilder.Properties;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
@@ -77,7 +78,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                 throw new ImageBuilderException("Duplicate filenames found in the import folder! Please check the log for more details.");             
             }
 
-            //SortFileInfos();
+            SortFileInfos();
 
             FsbFilePropertyBuilder.AddAllFileProperties(m_builderSettings, m_files, m_statusUpdater);
 
@@ -145,7 +146,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                     properties |= (ushort)(1u << fsbFileProperty.Index);
                 }
 
-                if (fsbFileInfo.DataLocation.LocationID == pixelData.DataLocation.LocationID)
+                if (!fsbFileInfo.IsDummy && (fsbFileInfo.DataLocation.LocationID == pixelData.DataLocation.LocationID))
                 {
                     AddPixelData(pixelData, fsbFileInfo, properties);
                 }
@@ -569,8 +570,17 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                     for (int j = 0; j < propertiesInFileInfos.Count; j++)
                     {
                         Property property = propertiesInFileInfos[j];
+                        int indexPrty = 0;
 
-                        keys.Add(new PropertyKeys(property.Name, property.Alias, activeProperty[j], j));
+                        foreach (Property prty in m_builderSettings.Properties)
+                        {
+                            if (property.Name == prty.Name)
+                            {
+                                indexPrty = m_builderSettings.Properties.IndexOf(prty);
+                            }
+                        }
+
+                        keys.Add(new PropertyKeys(property.Name, property.Alias, activeProperty[j], indexPrty));
                     }
 
                     AddOneToValue(activeProperty, maxNoOfValues);
@@ -599,6 +609,7 @@ namespace IRL_Gui_Image_Builder_Library.GuiImageBuilder.FileSystem.Files
                         dummy.FileNameWithoutProperties = rootFileInfo.FileNameWithoutProperties;
                         dummy.FileKey = newFileKey;
                         dummy.HasFileProperties = true;
+                        dummy.DataLocation = rootFileInfo.DataLocation;
 
                         FileInfos.Add(dummy);
 

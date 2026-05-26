@@ -40,50 +40,50 @@
             AddTextStylePropertyButton = new Button();
             DeleteTextStylePropertyButton = new Button();
             tableLayoutPanel4 = new TableLayoutPanel();
+            tableLayoutPanel5 = new TableLayoutPanel();
+            groupBox2 = new GroupBox();
+            SelectedFontLabel = new Label();
+            SelectFontButton = new Button();
+            panel10 = new Panel();
+            groupBox3 = new GroupBox();
             SelectBackColorButton = new Button();
-            BackColorTB = new CustomComponents.TextBoxes.ColorTextBox();
+            label1 = new Label();
+            BackColorTB = new IRL_Image_Creator.CustomComponents.TextBoxes.ColorTextBox();
+            backColorLabel = new Label();
+            textColorLabel = new Label();
+            TextColorTB = new IRL_Image_Creator.CustomComponents.TextBoxes.ColorTextBox();
+            label2 = new Label();
+            SelectTextColorButton = new Button();
+            groupBox1 = new GroupBox();
+            label5 = new Label();
+            PrefixTB = new TextBox();
+            label3 = new Label();
+            NameTB = new TextBox();
+            groupBox4 = new GroupBox();
             MonospaceNumbersCheckBox = new CheckBox();
             BottomMarginTB = new NumericUpDown();
-            RightMarginTB = new NumericUpDown();
-            TopMarginTB = new NumericUpDown();
             LeftMarginTB = new NumericUpDown();
-            label12 = new Label();
-            label11 = new Label();
-            label10 = new Label();
+            RightMarginTB = new NumericUpDown();
             label9 = new Label();
-            tableLayoutPanel5 = new TableLayoutPanel();
-            SelectFontButton = new Button();
-            SelectedFontLabel = new Label();
-            NameTB = new TextBox();
-            label3 = new Label();
-            PrefixTB = new TextBox();
-            label5 = new Label();
-            SelectTextColorButton = new Button();
-            TextColorTB = new CustomComponents.TextBoxes.ColorTextBox();
-            panel10 = new Panel();
-            label1 = new Label();
-            textColorLabel = new Label();
-            backColorLabel = new Label();
-            label2 = new Label();
+            TopMarginTB = new NumericUpDown();
+            label10 = new Label();
+            label11 = new Label();
+            label12 = new Label();
             SelectFontDialog = new FontDialog();
-            groupBox1 = new GroupBox();
-            groupBox2 = new GroupBox();
-            groupBox3 = new GroupBox();
-            groupBox4 = new GroupBox();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
+            tableLayoutPanel5.SuspendLayout();
+            groupBox2.SuspendLayout();
+            panel10.SuspendLayout();
+            groupBox3.SuspendLayout();
+            groupBox1.SuspendLayout();
+            groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)BottomMarginTB).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)LeftMarginTB).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RightMarginTB).BeginInit();
             ((System.ComponentModel.ISupportInitialize)TopMarginTB).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)LeftMarginTB).BeginInit();
-            tableLayoutPanel5.SuspendLayout();
-            panel10.SuspendLayout();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -237,104 +237,6 @@
             tableLayoutPanel4.Size = new Size(460, 430);
             tableLayoutPanel4.TabIndex = 9;
             // 
-            // SelectBackColorButton
-            // 
-            SelectBackColorButton.Location = new Point(142, 102);
-            SelectBackColorButton.Name = "SelectBackColorButton";
-            SelectBackColorButton.Size = new Size(83, 23);
-            SelectBackColorButton.TabIndex = 6;
-            SelectBackColorButton.Text = "Select Color";
-            SelectBackColorButton.UseVisualStyleBackColor = true;
-            SelectBackColorButton.Click += SelectBackColorButton_Click;
-            // 
-            // BackColorTB
-            // 
-            BackColorTB.BackColor = SystemColors.Control;
-            BackColorTB.Color = Color.White;
-            BackColorTB.Location = new Point(12, 99);
-            BackColorTB.MinimumSize = new Size(0, 30);
-            BackColorTB.Name = "BackColorTB";
-            BackColorTB.Size = new Size(118, 30);
-            BackColorTB.TabIndex = 5;
-            // 
-            // MonospaceNumbersCheckBox
-            // 
-            MonospaceNumbersCheckBox.AutoSize = true;
-            MonospaceNumbersCheckBox.Location = new Point(139, 22);
-            MonospaceNumbersCheckBox.Name = "MonospaceNumbersCheckBox";
-            MonospaceNumbersCheckBox.Size = new Size(140, 19);
-            MonospaceNumbersCheckBox.TabIndex = 12;
-            MonospaceNumbersCheckBox.Text = "Monospace Numbers";
-            MonospaceNumbersCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // BottomMarginTB
-            // 
-            BottomMarginTB.Location = new Point(64, 91);
-            BottomMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
-            BottomMarginTB.Name = "BottomMarginTB";
-            BottomMarginTB.Size = new Size(42, 23);
-            BottomMarginTB.TabIndex = 32;
-            // 
-            // RightMarginTB
-            // 
-            RightMarginTB.Location = new Point(64, 68);
-            RightMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
-            RightMarginTB.Name = "RightMarginTB";
-            RightMarginTB.Size = new Size(42, 23);
-            RightMarginTB.TabIndex = 31;
-            // 
-            // TopMarginTB
-            // 
-            TopMarginTB.Location = new Point(64, 45);
-            TopMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
-            TopMarginTB.Name = "TopMarginTB";
-            TopMarginTB.Size = new Size(42, 23);
-            TopMarginTB.TabIndex = 30;
-            // 
-            // LeftMarginTB
-            // 
-            LeftMarginTB.Location = new Point(64, 22);
-            LeftMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
-            LeftMarginTB.Name = "LeftMarginTB";
-            LeftMarginTB.Size = new Size(42, 23);
-            LeftMarginTB.TabIndex = 29;
-            // 
-            // label12
-            // 
-            label12.AutoSize = true;
-            label12.Location = new Point(31, 27);
-            label12.Name = "label12";
-            label12.Size = new Size(27, 15);
-            label12.TabIndex = 21;
-            label12.Text = "Left";
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new Point(31, 50);
-            label11.Name = "label11";
-            label11.Size = new Size(27, 15);
-            label11.TabIndex = 22;
-            label11.Text = "Top";
-            // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new Point(23, 73);
-            label10.Name = "label10";
-            label10.Size = new Size(35, 15);
-            label10.TabIndex = 23;
-            label10.Text = "Right";
-            // 
-            // label9
-            // 
-            label9.AutoSize = true;
-            label9.Location = new Point(13, 96);
-            label9.Name = "label9";
-            label9.Size = new Size(47, 15);
-            label9.TabIndex = 24;
-            label9.Text = "Bottom";
-            // 
             // tableLayoutPanel5
             // 
             tableLayoutPanel5.ColumnCount = 2;
@@ -350,139 +252,6 @@
             tableLayoutPanel5.Size = new Size(460, 60);
             tableLayoutPanel5.TabIndex = 10;
             // 
-            // SelectFontButton
-            // 
-            SelectFontButton.Location = new Point(13, 22);
-            SelectFontButton.Name = "SelectFontButton";
-            SelectFontButton.Size = new Size(75, 23);
-            SelectFontButton.TabIndex = 0;
-            SelectFontButton.Text = "Select Font";
-            SelectFontButton.UseVisualStyleBackColor = true;
-            SelectFontButton.Click += SelectFontButton_Click;
-            // 
-            // SelectedFontLabel
-            // 
-            SelectedFontLabel.AutoSize = true;
-            SelectedFontLabel.Location = new Point(94, 26);
-            SelectedFontLabel.Name = "SelectedFontLabel";
-            SelectedFontLabel.Size = new Size(36, 15);
-            SelectedFontLabel.TabIndex = 1;
-            SelectedFontLabel.Text = "None";
-            // 
-            // NameTB
-            // 
-            NameTB.Location = new Point(64, 22);
-            NameTB.Name = "NameTB";
-            NameTB.Size = new Size(214, 23);
-            NameTB.TabIndex = 9;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(19, 25);
-            label3.Name = "label3";
-            label3.Size = new Size(39, 15);
-            label3.TabIndex = 8;
-            label3.Text = "Name";
-            // 
-            // PrefixTB
-            // 
-            PrefixTB.Location = new Point(64, 51);
-            PrefixTB.Name = "PrefixTB";
-            PrefixTB.Size = new Size(214, 23);
-            PrefixTB.TabIndex = 0;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(22, 51);
-            label5.Name = "label5";
-            label5.Size = new Size(36, 15);
-            label5.TabIndex = 0;
-            label5.Text = "Prefix";
-            // 
-            // SelectTextColorButton
-            // 
-            SelectTextColorButton.Location = new Point(142, 40);
-            SelectTextColorButton.Name = "SelectTextColorButton";
-            SelectTextColorButton.Size = new Size(83, 23);
-            SelectTextColorButton.TabIndex = 5;
-            SelectTextColorButton.Text = "Select Color";
-            SelectTextColorButton.UseVisualStyleBackColor = true;
-            SelectTextColorButton.Click += SelectTextColorButton_Click;
-            // 
-            // TextColorTB
-            // 
-            TextColorTB.BackColor = SystemColors.Control;
-            TextColorTB.Color = Color.White;
-            TextColorTB.Location = new Point(12, 37);
-            TextColorTB.MinimumSize = new Size(0, 30);
-            TextColorTB.Name = "TextColorTB";
-            TextColorTB.Size = new Size(118, 30);
-            TextColorTB.TabIndex = 4;
-            // 
-            // panel10
-            // 
-            panel10.Controls.Add(groupBox3);
-            panel10.Dock = DockStyle.Fill;
-            panel10.Location = new Point(0, 150);
-            panel10.Margin = new Padding(0);
-            panel10.Name = "panel10";
-            panel10.Size = new Size(460, 140);
-            panel10.TabIndex = 16;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(16, 19);
-            label1.Name = "label1";
-            label1.Size = new Size(60, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Text Color";
-            // 
-            // textColorLabel
-            // 
-            textColorLabel.AutoSize = true;
-            textColorLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            textColorLabel.Location = new Point(82, 19);
-            textColorLabel.Name = "textColorLabel";
-            textColorLabel.Size = new Size(12, 15);
-            textColorLabel.TabIndex = 2;
-            textColorLabel.Text = "-";
-            // 
-            // backColorLabel
-            // 
-            backColorLabel.AutoSize = true;
-            backColorLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            backColorLabel.Location = new Point(82, 81);
-            backColorLabel.Name = "backColorLabel";
-            backColorLabel.Size = new Size(12, 15);
-            backColorLabel.TabIndex = 4;
-            backColorLabel.Text = "-";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(12, 81);
-            label2.Name = "label2";
-            label2.Size = new Size(64, 15);
-            label2.TabIndex = 3;
-            label2.Text = "Back Color";
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(label5);
-            groupBox1.Controls.Add(PrefixTB);
-            groupBox1.Controls.Add(label3);
-            groupBox1.Controls.Add(NameTB);
-            groupBox1.Dock = DockStyle.Fill;
-            groupBox1.Location = new Point(3, 3);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(454, 84);
-            groupBox1.TabIndex = 36;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Style Name";
-            // 
             // groupBox2
             // 
             groupBox2.Controls.Add(SelectedFontLabel);
@@ -494,6 +263,35 @@
             groupBox2.TabIndex = 0;
             groupBox2.TabStop = false;
             groupBox2.Text = "Style Font";
+            // 
+            // SelectedFontLabel
+            // 
+            SelectedFontLabel.AutoSize = true;
+            SelectedFontLabel.Location = new Point(94, 26);
+            SelectedFontLabel.Name = "SelectedFontLabel";
+            SelectedFontLabel.Size = new Size(36, 15);
+            SelectedFontLabel.TabIndex = 1;
+            SelectedFontLabel.Text = "None";
+            // 
+            // SelectFontButton
+            // 
+            SelectFontButton.Location = new Point(13, 22);
+            SelectFontButton.Name = "SelectFontButton";
+            SelectFontButton.Size = new Size(75, 23);
+            SelectFontButton.TabIndex = 0;
+            SelectFontButton.Text = "Select Font";
+            SelectFontButton.UseVisualStyleBackColor = true;
+            SelectFontButton.Click += SelectFontButton_Click;
+            // 
+            // panel10
+            // 
+            panel10.Controls.Add(groupBox3);
+            panel10.Dock = DockStyle.Fill;
+            panel10.Location = new Point(0, 150);
+            panel10.Margin = new Padding(0);
+            panel10.Name = "panel10";
+            panel10.Size = new Size(460, 140);
+            panel10.TabIndex = 16;
             // 
             // groupBox3
             // 
@@ -512,6 +310,128 @@
             groupBox3.TabIndex = 0;
             groupBox3.TabStop = false;
             groupBox3.Text = "Style Colors";
+            // 
+            // SelectBackColorButton
+            // 
+            SelectBackColorButton.Location = new Point(142, 102);
+            SelectBackColorButton.Name = "SelectBackColorButton";
+            SelectBackColorButton.Size = new Size(83, 23);
+            SelectBackColorButton.TabIndex = 6;
+            SelectBackColorButton.Text = "Select Color";
+            SelectBackColorButton.UseVisualStyleBackColor = true;
+            SelectBackColorButton.Click += SelectBackColorButton_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(16, 19);
+            label1.Name = "label1";
+            label1.Size = new Size(60, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Text Color";
+            // 
+            // BackColorTB
+            // 
+            BackColorTB.BackColor = SystemColors.Control;
+            BackColorTB.Location = new Point(12, 99);
+            BackColorTB.MinimumSize = new Size(0, 30);
+            BackColorTB.Name = "BackColorTB";
+            BackColorTB.Size = new Size(118, 30);
+            BackColorTB.TabIndex = 5;
+            // 
+            // backColorLabel
+            // 
+            backColorLabel.AutoSize = true;
+            backColorLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            backColorLabel.Location = new Point(82, 81);
+            backColorLabel.Name = "backColorLabel";
+            backColorLabel.Size = new Size(12, 15);
+            backColorLabel.TabIndex = 4;
+            backColorLabel.Text = "-";
+            // 
+            // textColorLabel
+            // 
+            textColorLabel.AutoSize = true;
+            textColorLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            textColorLabel.Location = new Point(82, 19);
+            textColorLabel.Name = "textColorLabel";
+            textColorLabel.Size = new Size(12, 15);
+            textColorLabel.TabIndex = 2;
+            textColorLabel.Text = "-";
+            // 
+            // TextColorTB
+            // 
+            TextColorTB.BackColor = SystemColors.Control;
+            TextColorTB.Location = new Point(12, 37);
+            TextColorTB.MinimumSize = new Size(0, 30);
+            TextColorTB.Name = "TextColorTB";
+            TextColorTB.Size = new Size(118, 30);
+            TextColorTB.TabIndex = 4;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(12, 81);
+            label2.Name = "label2";
+            label2.Size = new Size(64, 15);
+            label2.TabIndex = 3;
+            label2.Text = "Back Color";
+            // 
+            // SelectTextColorButton
+            // 
+            SelectTextColorButton.Location = new Point(142, 40);
+            SelectTextColorButton.Name = "SelectTextColorButton";
+            SelectTextColorButton.Size = new Size(83, 23);
+            SelectTextColorButton.TabIndex = 5;
+            SelectTextColorButton.Text = "Select Color";
+            SelectTextColorButton.UseVisualStyleBackColor = true;
+            SelectTextColorButton.Click += SelectTextColorButton_Click;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(label5);
+            groupBox1.Controls.Add(PrefixTB);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Controls.Add(NameTB);
+            groupBox1.Dock = DockStyle.Fill;
+            groupBox1.Location = new Point(3, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(454, 84);
+            groupBox1.TabIndex = 36;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Style Name";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(22, 51);
+            label5.Name = "label5";
+            label5.Size = new Size(36, 15);
+            label5.TabIndex = 0;
+            label5.Text = "Prefix";
+            // 
+            // PrefixTB
+            // 
+            PrefixTB.Location = new Point(64, 51);
+            PrefixTB.Name = "PrefixTB";
+            PrefixTB.Size = new Size(214, 23);
+            PrefixTB.TabIndex = 0;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(19, 25);
+            label3.Name = "label3";
+            label3.Size = new Size(39, 15);
+            label3.TabIndex = 8;
+            label3.Text = "Name";
+            // 
+            // NameTB
+            // 
+            NameTB.Location = new Point(64, 22);
+            NameTB.Name = "NameTB";
+            NameTB.Size = new Size(214, 23);
+            NameTB.TabIndex = 9;
             // 
             // groupBox4
             // 
@@ -532,6 +452,84 @@
             groupBox4.TabStop = false;
             groupBox4.Text = "Margin";
             // 
+            // MonospaceNumbersCheckBox
+            // 
+            MonospaceNumbersCheckBox.AutoSize = true;
+            MonospaceNumbersCheckBox.Location = new Point(139, 22);
+            MonospaceNumbersCheckBox.Name = "MonospaceNumbersCheckBox";
+            MonospaceNumbersCheckBox.Size = new Size(140, 19);
+            MonospaceNumbersCheckBox.TabIndex = 12;
+            MonospaceNumbersCheckBox.Text = "Monospace Numbers";
+            MonospaceNumbersCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // BottomMarginTB
+            // 
+            BottomMarginTB.Location = new Point(64, 91);
+            BottomMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
+            BottomMarginTB.Name = "BottomMarginTB";
+            BottomMarginTB.Size = new Size(42, 23);
+            BottomMarginTB.TabIndex = 32;
+            // 
+            // LeftMarginTB
+            // 
+            LeftMarginTB.Location = new Point(64, 22);
+            LeftMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
+            LeftMarginTB.Name = "LeftMarginTB";
+            LeftMarginTB.Size = new Size(42, 23);
+            LeftMarginTB.TabIndex = 29;
+            // 
+            // RightMarginTB
+            // 
+            RightMarginTB.Location = new Point(64, 68);
+            RightMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
+            RightMarginTB.Name = "RightMarginTB";
+            RightMarginTB.Size = new Size(42, 23);
+            RightMarginTB.TabIndex = 31;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(13, 96);
+            label9.Name = "label9";
+            label9.Size = new Size(47, 15);
+            label9.TabIndex = 24;
+            label9.Text = "Bottom";
+            // 
+            // TopMarginTB
+            // 
+            TopMarginTB.Location = new Point(64, 45);
+            TopMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
+            TopMarginTB.Name = "TopMarginTB";
+            TopMarginTB.Size = new Size(42, 23);
+            TopMarginTB.TabIndex = 30;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(23, 73);
+            label10.Name = "label10";
+            label10.Size = new Size(35, 15);
+            label10.TabIndex = 23;
+            label10.Text = "Right";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(31, 50);
+            label11.Name = "label11";
+            label11.Size = new Size(27, 15);
+            label11.TabIndex = 22;
+            label11.Text = "Top";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Location = new Point(31, 27);
+            label12.Name = "label12";
+            label12.Size = new Size(27, 15);
+            label12.TabIndex = 21;
+            label12.Text = "Left";
+            // 
             // EditTextStyleForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -545,20 +543,20 @@
             tableLayoutPanel2.PerformLayout();
             tableLayoutPanel3.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)BottomMarginTB).EndInit();
-            ((System.ComponentModel.ISupportInitialize)RightMarginTB).EndInit();
-            ((System.ComponentModel.ISupportInitialize)TopMarginTB).EndInit();
-            ((System.ComponentModel.ISupportInitialize)LeftMarginTB).EndInit();
             tableLayoutPanel5.ResumeLayout(false);
-            panel10.ResumeLayout(false);
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
+            panel10.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)BottomMarginTB).EndInit();
+            ((System.ComponentModel.ISupportInitialize)LeftMarginTB).EndInit();
+            ((System.ComponentModel.ISupportInitialize)RightMarginTB).EndInit();
+            ((System.ComponentModel.ISupportInitialize)TopMarginTB).EndInit();
             ResumeLayout(false);
         }
 

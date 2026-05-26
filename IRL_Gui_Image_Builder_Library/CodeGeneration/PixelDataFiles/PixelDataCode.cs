@@ -161,9 +161,10 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
             CodeGenegrationUtils.BlankLine(sw);
 
             sw.WriteLine(
-                "void fs_read(uint16_t *restrict p_buffer, const uint32_t bufferLength, fs_pixeldata_info_s *p_pixelDataInfo)\n" +
+                "uint32_t fs_read(uint16_t *restrict p_buffer, const uint32_t bufferLength, fs_pixeldata_info_s *p_pixelDataInfo)\n" +
                 "{\n" +
                 "    uint32_t writeIndex = 0;\n" +
+                "    uint32_t pixelsRead = 0;\n" +
                 "\n" +
                 "    if (p_pixelDataInfo->noOfPixelsLeft > 0)\n" +
                 "    {\n" +
@@ -171,6 +172,7 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
                 "        {\n" +
                 "            fs_addPixels(p_buffer, writeIndex, p_pixelDataInfo->noOfPixelsLeft, p_pixelDataInfo->colorPixelLeft);\n" +
                 "            writeIndex += p_pixelDataInfo->noOfPixelsLeft;\n" +
+                "            pixelsRead += p_pixelDataInfo->noOfPixelsLeft;\n" +
                 "            p_pixelDataInfo->pixelsToRead -= p_pixelDataInfo->noOfPixelsLeft;\n" +
                 "            p_pixelDataInfo->noOfPixelsLeft = 0;\n" +
                 "        }\n" +
@@ -178,10 +180,11 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
                 "        {\n" +
                 "            fs_addPixels(p_buffer, writeIndex, bufferLength, p_pixelDataInfo->colorPixelLeft);\n" +
                 "            writeIndex += bufferLength;\n" +
+                "            pixelsRead += bufferLength;\n" +
                 "            p_pixelDataInfo->pixelsToRead -= bufferLength;\n" +
                 "            p_pixelDataInfo->noOfPixelsLeft -= bufferLength;\n" +
                 "\n" +
-                "            return;\n" +
+                "            return pixelsRead;\n" +
                 "        }\n" +
                 "    }\n" +
                 "    else\n" +
@@ -203,12 +206,14 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
                 "        {\n" +
                 "            fs_addPixels(p_buffer, writeIndex, noOfPixels, color);\n" +
                 "            writeIndex += noOfPixels;\n" +
+                "            pixelsRead += noOfPixels;\n" +
                 "            p_pixelDataInfo->pixelsToRead -= noOfPixels;\n" +
                 "        }\n" +
                 "        else if (p_pixelDataInfo->pixelsToRead < noOfPixels)\n" +
                 "        {\n" +
                 "            fs_addPixels(p_buffer, writeIndex, p_pixelDataInfo->pixelsToRead, color);\n" +
                 "            writeIndex += p_pixelDataInfo->pixelsToRead;\n" +
+                "            pixelsRead += p_pixelDataInfo->pixelsToRead;\n" +
                 "            p_pixelDataInfo->noOfPixelsLeft = noOfPixels - p_pixelDataInfo->pixelsToRead;\n" +
                 "            p_pixelDataInfo->colorPixelLeft = color;\n" +
                 "            p_pixelDataInfo->pixelsToRead = 0;\n" +
@@ -217,10 +222,13 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
                 "        {\n" +
                 "            fs_addPixels(p_buffer, writeIndex, noOfPixels, color);\n" +
                 "            writeIndex += noOfPixels;\n" +
+                "            pixelsRead += noOfPixels;\n" +
                 "            p_pixelDataInfo->pixelsToRead = 0;\n" +
                 "            p_pixelDataInfo->noOfPixelsLeft = 0;\n" +
                 "        }\n" +
                 "    }\n" +
+                "\n" +
+                "    return pixelsRead;\n" +
                 "}\n");
 
             CodeGenegrationUtils.BlankLine(sw);

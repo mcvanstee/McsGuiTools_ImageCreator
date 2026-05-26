@@ -66,9 +66,10 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration
 
             if (maxProperties != 0)
             {
-                string propertiesStr = ", .properties = " + file.Properties;
-                string filename = fsbFileInfo.IsDummy ? "Dummy file, " + fsbFileInfo.FileKey : fsbFileInfo.Filename;
-                string comment = $"    /* {filename}, {Convert.ToString(file.Properties, 2)}, {dataLocationStr} */";
+                string propertiesStr = $", .properties = 0x{file.Properties:X}";
+                string filename = fsbFileInfo.IsDummy ? fsbFileInfo.FileKey : fsbFileInfo.Filename;
+                string dummyStr = fsbFileInfo.IsDummy ? "Dummy file" : "";
+                string comment = $"    /* {filename}, {Convert.ToString(file.Properties, 2)}, {dataLocationStr} {dummyStr}*/";
 
                 sw.WriteLine("    { .dataOffset = " + dataOffsetStr + propertiesStr + ", .width = " + file.Width.ToString() + ", .height = " + file.Height.ToString() + " }," + comment);
             }

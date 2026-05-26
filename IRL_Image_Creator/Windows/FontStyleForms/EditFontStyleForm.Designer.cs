@@ -172,7 +172,7 @@
             // BottomMarginTB
             // 
             BottomMarginTB.Location = new Point(64, 94);
-            BottomMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            BottomMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
             BottomMarginTB.Name = "BottomMarginTB";
             BottomMarginTB.Size = new Size(42, 23);
             BottomMarginTB.TabIndex = 32;
@@ -180,7 +180,7 @@
             // RightMarginTB
             // 
             RightMarginTB.Location = new Point(64, 71);
-            RightMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            RightMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
             RightMarginTB.Name = "RightMarginTB";
             RightMarginTB.Size = new Size(42, 23);
             RightMarginTB.TabIndex = 31;
@@ -188,7 +188,7 @@
             // TopMarginTB
             // 
             TopMarginTB.Location = new Point(64, 48);
-            TopMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            TopMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
             TopMarginTB.Name = "TopMarginTB";
             TopMarginTB.Size = new Size(42, 23);
             TopMarginTB.TabIndex = 30;
@@ -196,7 +196,7 @@
             // LeftMarginTB
             // 
             LeftMarginTB.Location = new Point(64, 25);
-            LeftMarginTB.Minimum = new decimal(new int[] { 10, 0, 0, int.MinValue });
+            LeftMarginTB.Minimum = new decimal(new int[] { 50, 0, 0, int.MinValue });
             LeftMarginTB.Name = "LeftMarginTB";
             LeftMarginTB.Size = new Size(42, 23);
             LeftMarginTB.TabIndex = 29;
