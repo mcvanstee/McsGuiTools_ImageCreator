@@ -12,7 +12,6 @@ namespace IRL_Gui_Image_Builder_Library.CodeGeneration.PixelDataFiles
             string filePath = Path.Combine(FileConstants.GetSourceFolder(), FileConstants.PIXEL_DATA_RLE_A_FILE + ".h");
             StreamWriter sw = new(filePath);
 
-
             CodeGenegrationUtils.AddCopyRight(sw);
             CodeGenegrationUtils.AddHeaderGuardBegin(sw, FileConstants.PIXEL_DATA_RLE_A_FILE);
             CodeGenegrationUtils.AddExternCBegin(sw);
